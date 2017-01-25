@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">The Shorthorn App</string>
+    <string name="ADITYA_MHATRE">ADITYA_MHATRE</string>
+    <string name="SHRADDHA_GHOGARE">SHRADDHA_GHOGARE </string>
+    <string name="ADITYA_PANDEY">ADITYA_PANDEY</string>
+    <string name="VIBHOR_KAINTH">VIBHOR_KAINTH</string>
+    <string name="SANGEET_PUTHUR">SANGEET_PUTHUR</string>
+    <string name="SRINIVAS_CHAVALI">SRINIVAS_CHAVALI</string>
+    <string name="BRIJESH_DHANKARA">BRIJESH_DHANKARA</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
