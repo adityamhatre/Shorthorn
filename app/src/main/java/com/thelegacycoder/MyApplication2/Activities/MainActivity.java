@@ -57,8 +57,10 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
 
     void changeFragment(Fragment fragment) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.container, fragment, "tag");
-        fragmentTransaction.commit();
+        if (fragmentTransaction != null) {
+            fragmentTransaction.replace(R.id.container, fragment, "tag");
+            fragmentTransaction.commit();
+        }
     }
 
 
