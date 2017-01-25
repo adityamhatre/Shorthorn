@@ -1,4 +1,4 @@
-package com.thelogicalcoder.MyApplication2.Activities;
+package com.thelegacycoder.MyApplication2.Activities;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,9 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.thelogicalcoder.MyApplication2.Fragments.ExampleFragment;
-import com.thelogicalcoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
-import com.thelogicalcoder.theshorthornapp.R;
+import com.thelegacycoder.MyApplication2.Fragments.ExampleFragment;
+import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
+import com.thelegacycoder.MyApplication2.R;
 
 public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 

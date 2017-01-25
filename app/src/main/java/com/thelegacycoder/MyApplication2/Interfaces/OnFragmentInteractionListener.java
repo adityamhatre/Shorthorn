@@ -1,4 +1,4 @@
-package com.thelogicalcoder.MyApplication2.Interfaces;
+package com.thelegacycoder.MyApplication2.Interfaces;
 
 /**
  * Created by Aditya on 025, 25 Jan, 2017.

@@ -4,7 +4,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "23.0.3"
     defaultConfig {
-        applicationId "com.thelogicalcoder.theshorthornapp"
+        applicationId "com.thelegacycoder.MyApplication2"
         minSdkVersion 19
         targetSdkVersion 25
         versionCode 1

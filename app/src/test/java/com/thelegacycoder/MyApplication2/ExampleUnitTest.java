@@ -1,4 +1,4 @@
-package com.thelogicalcoder.myapplication;
+package com.thelegacycoder.theshorthornapp;
 
 import org.junit.Test;
 

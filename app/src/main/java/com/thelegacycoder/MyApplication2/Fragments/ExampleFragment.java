@@ -1,4 +1,4 @@
-package com.thelogicalcoder.MyApplication2.Fragments;
+package com.thelegacycoder.MyApplication2.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.thelogicalcoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
-import com.thelogicalcoder.theshorthornapp.R;
+import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
+import com.thelegacycoder.MyApplication2.R;
 
 /**
  * A simple {@link Fragment} subclass.
