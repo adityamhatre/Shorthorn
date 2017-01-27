@@ -1,5 +1,6 @@
 package com.thelegacycoder.MyApplication2.Activities;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,54 +10,57 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
-import com.thelegacycoder.MyApplication2.Fragments.ExampleFragment;
+import com.thelegacycoder.MyApplication2.Fragments.LoginFragment;
+import com.thelegacycoder.MyApplication2.Fragments.LoginRegisterFragment;
 import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.MyApplication2.R;
 
-public class MainActivity extends AppCompatActivity implements OnFragmentInteractionListener {
+public class HomeActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
 
     DrawerLayout drawerLayout;
+    Class currentFragment = LoginRegisterFragment.class;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
 
         initToolbar();
         init_UI_Elements();
 
+        changeFragment(LoginFragment.newInstance("init"));
         findViewById(R.id.b1).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                changeFragment(ExampleFragment.newInstance("aditya"));
+                changeFragment(LoginFragment.newInstance("aditya"));
             }
         });
         findViewById(R.id.b2).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                changeFragment(ExampleFragment.newInstance("mhatre"));
+                changeFragment(LoginRegisterFragment.newInstance("aditya", "mhatre"));
             }
         });
 
     }
 
-
     void initToolbar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
-
-
+        toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
-                R.string.ADITYA_MHATRE, R.string.SHRADDHA_GHOGARE
+                R.string.ADITYA_MHATRE, R.string.SANGEET_PUTHUR
         );
+
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -67,19 +71,23 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
     }
 
     void init_UI_Elements() {
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     }
 
     void changeFragment(Fragment fragment) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        if (fragmentTransaction != null) {
-            fragmentTransaction.replace(R.id.container, fragment, "tag");
-            fragmentTransaction.commit();
+        if (currentFragment != fragment.getClass()) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+            if (fragmentTransaction != null) {
+                fragmentTransaction.replace(R.id.container, fragment, "tag");
+                fragmentTransaction.commit();
+            }
+
+            currentFragment = fragment.getClass();
         }
         closeDrawer();
+        invalidateOptionsMenu();
+
     }
-
-
 
 
     void openDrawer() {
@@ -92,6 +100,15 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if (currentFragment != LoginFragment.class)
+            menu.add("Login")
+                    .setIcon(android.R.drawable.ic_menu_search)
+                    .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

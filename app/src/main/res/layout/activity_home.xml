@@ -1,17 +1,23 @@
-<!-- The main content view -->
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/content_frame"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.thelegacycoder.MyApplication2.Activities.MainActivity">
+    android:fitsSystemWindows="true"
+    tools:context="com.thelegacycoder.MyApplication2.Activities.HomeActivity">
 
 
-<android.support.v7.widget.Toolbar
+    <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary" />
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:layout_scrollFlags="scroll|enterAlways"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+    </android.support.v7.widget.Toolbar>
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -41,19 +47,28 @@
             android:orientation="vertical">
 
             <Button
+                android:id="@+id/b1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/b1"
-                android:text="@string/ADITYA_MHATRE" />
+                android:text="@string/SHRADDHA_GHOGARE" />
 
             <Button
-                android:layout_width="match_parent"
                 android:id="@+id/b2"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="mhatre"
                 android:text="@string/SANGEET_PUTHUR" />
         </LinearLayout>
     </android.support.v4.widget.DrawerLayout>
 
+</RelativeLayout>
 
-</RelativeLayout><!-- The navigation drawer -->
+
+
+
+
+
+
+
+
+
