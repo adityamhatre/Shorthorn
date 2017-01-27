@@ -28,6 +28,21 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
         initToolbar();
         init_UI_Elements();
 
+        findViewById(R.id.b1).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                changeFragment(ExampleFragment.newInstance("aditya"));
+            }
+        });
+        findViewById(R.id.b2).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                changeFragment(ExampleFragment.newInstance("mhatre"));
+            }
+        });
+
     }
 
 
@@ -61,18 +76,11 @@ public class MainActivity extends AppCompatActivity implements OnFragmentInterac
             fragmentTransaction.replace(R.id.container, fragment, "tag");
             fragmentTransaction.commit();
         }
-    }
-
-
-    void aditya(View v) {
-        changeFragment(ExampleFragment.newInstance("aditya", "asdf"));
         closeDrawer();
     }
 
-    void mhatre(View v) {
-        changeFragment(ExampleFragment.newInstance("mhatre", "asdf"));
-        closeDrawer();
-    }
+
+
 
     void openDrawer() {
         if (drawerLayout != null) {

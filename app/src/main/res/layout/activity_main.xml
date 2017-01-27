@@ -43,14 +43,15 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="aditya"
+                android:id="@+id/b1"
                 android:text="@string/ADITYA_MHATRE" />
 
             <Button
                 android:layout_width="match_parent"
+                android:id="@+id/b2"
                 android:layout_height="wrap_content"
                 android:onClick="mhatre"
-                android:text="@string/ADITYA_MHATRE" />
+                android:text="@string/SANGEET_PUTHUR" />
         </LinearLayout>
     </android.support.v4.widget.DrawerLayout>
 
