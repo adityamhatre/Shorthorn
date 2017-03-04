@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.MyApplication2.R;
 
-public class LoginFragment extends Fragment {
+public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -22,12 +22,12 @@ public class LoginFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public LoginFragment() {
+    public HomeFragment() {
         // Required empty public constructor
     }
 
-    public static LoginFragment newInstance(String param1, String param2) {
-        LoginFragment fragment = new LoginFragment();
+    public static HomeFragment newInstance(String param1, String param2) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -35,8 +35,8 @@ public class LoginFragment extends Fragment {
         return fragment;
     }
 
-    public static LoginFragment newInstance(String param1) {
-        LoginFragment fragment = new LoginFragment();
+    public static HomeFragment newInstance(String param1) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, "");
@@ -63,6 +63,7 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ((TextView) view.findViewById(R.id.text)).setText(mParam1);
+
     }
 
     public void onButtonPressed(Uri uri) {

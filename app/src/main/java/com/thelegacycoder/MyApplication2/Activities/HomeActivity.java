@@ -3,6 +3,8 @@ package com.thelegacycoder.MyApplication2.Activities;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -12,9 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.thelegacycoder.MyApplication2.Fragments.LoginFragment;
+import com.thelegacycoder.MyApplication2.Fragments.HomeFragment;
 import com.thelegacycoder.MyApplication2.Fragments.LoginRegisterFragment;
 import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.MyApplication2.R;
@@ -24,6 +25,9 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     DrawerLayout drawerLayout;
     Class currentFragment = LoginRegisterFragment.class;
+    Toolbar toolbar;
+
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,33 +36,48 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
         initToolbar();
         init_UI_Elements();
+        setListeners();
 
-        changeFragment(LoginFragment.newInstance("init"));
-        findViewById(R.id.b1).setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View view) {
-                changeFragment(LoginFragment.newInstance("aditya"));
-            }
-        });
-        findViewById(R.id.b2).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                changeFragment(LoginRegisterFragment.newInstance("aditya", "mhatre"));
-            }
-        });
+        changeFragment(HomeFragment.newInstance("Welcome"));
 
     }
 
+    private void setListeners() {
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setChecked(true);
+                closeDrawer();
+
+                switch (item.getItemId()) {
+                    case R.id.drawer_item_login:
+                        changeFragment(LoginRegisterFragment.newInstance(0));
+                        break;
+                    case R.id.drawer_item_register:
+                        changeFragment(LoginRegisterFragment.newInstance(1));
+                        break;
+                    case R.id.drawer_item_home:
+                        changeFragment(HomeFragment.newInstance("Welcome"));
+                        break;
+                }
+
+                return false;
+            }
+        });
+    }
+
     void initToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitleTextColor(Color.WHITE);
         setSupportActionBar(toolbar);
+    }
+
+    void init_UI_Elements() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(
                 this, drawerLayout, toolbar,
-                R.string.ADITYA_MHATRE, R.string.SANGEET_PUTHUR
+                R.string.OPEN_DRAWER, R.string.CLOSE_DRAWER
         );
 
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
@@ -68,13 +87,12 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             actionBarDrawerToggle.syncState();
         }
 
-    }
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-    void init_UI_Elements() {
     }
 
     void changeFragment(Fragment fragment) {
-        if (currentFragment != fragment.getClass()) {
+        //if (currentFragment != fragment.getClass()) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
             if (fragmentTransaction != null) {
@@ -83,7 +101,7 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             }
 
             currentFragment = fragment.getClass();
-        }
+        //}
         closeDrawer();
         invalidateOptionsMenu();
 
@@ -104,9 +122,9 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (currentFragment != LoginFragment.class)
-            menu.add("Login")
-                    .setIcon(android.R.drawable.ic_menu_search)
+        if (currentFragment != HomeFragment.class)
+            menu.add("Help")
+                    .setIcon(android.R.drawable.ic_menu_help)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return super.onCreateOptionsMenu(menu);
     }

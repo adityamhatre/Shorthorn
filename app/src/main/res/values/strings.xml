@@ -13,4 +13,6 @@
     <string name="title_activity_login_register">LoginRegisterActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="CLOSE_DRAWER">Close Drawer</string>
+    <string name="OPEN_DRAWER">Open Drawer</string>
 </resources>

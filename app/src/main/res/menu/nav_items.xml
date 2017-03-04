@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/drawer_item_home"
+            android:checked="true"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Home" />
+        <item
+            android:id="@+id/drawer_item_login"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Login" />
+        <item
+            android:id="@+id/drawer_item_register"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Register" />
+    </group>
+
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_item_settings"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Third" />
+    </group>
+</menu>

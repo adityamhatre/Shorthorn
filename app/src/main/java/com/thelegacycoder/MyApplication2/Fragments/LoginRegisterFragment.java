@@ -3,6 +3,7 @@ package com.thelegacycoder.MyApplication2.Fragments;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,27 +17,29 @@ import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListene
 import com.thelegacycoder.MyApplication2.R;
 
 public class LoginRegisterFragment extends Fragment {
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    String param1;
-    String param2;
+    private static final String ARG_MODE = "mode";
 
     OnFragmentInteractionListener onFragmentInteractionListener;
     ViewPager viewPager;
     TabLayout tabLayout;
     SectionsPagerAdapter sectionsPagerAdapter;
 
+    int mode;
 
     public LoginRegisterFragment() {
-        // Required empty public constructor
     }
 
     public static LoginRegisterFragment newInstance(String param1, String param2) {
         LoginRegisterFragment fragment = new LoginRegisterFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static LoginRegisterFragment newInstance(int mode) { //mode: 0 => Login, mode: 1 => Register
+        LoginRegisterFragment fragment = new LoginRegisterFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_MODE, mode);
         fragment.setArguments(args);
         return fragment;
     }
@@ -44,12 +47,8 @@ public class LoginRegisterFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            param1 = getArguments().getString(ARG_PARAM1);
-            param2 = getArguments().getString(ARG_PARAM2);
-            System.out.println(param1 + ", " + param2);
-            sectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
-        }
+        sectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+
     }
 
     @Override
@@ -62,6 +61,8 @@ public class LoginRegisterFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mode = getArguments().getInt(ARG_MODE);
+
         viewPager = (ViewPager) view.findViewById(R.id.container);
         tabLayout = (TabLayout) view.findViewById(R.id.tabs);
 
@@ -70,6 +71,33 @@ public class LoginRegisterFragment extends Fragment {
 
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabTextColors(Color.WHITE, Color.WHITE);
+
+
+        new Handler().postDelayed(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        tabLayout.getTabAt(mode).select();
+                    }
+                }, 100);
+
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override

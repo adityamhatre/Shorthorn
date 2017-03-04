@@ -35,30 +35,17 @@
                 android:layout_height="match_parent" />
         </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/left_drawer"
-            android:layout_width="240dp"
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
-            android:background="#33111111"
-            android:choiceMode="singleChoice"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="0dp"
-            android:orientation="vertical">
+            app:headerLayout="@layout/nav_header"
+            android:fitsSystemWindows="true"
+            app:menu="@menu/nav_items" />
 
-            <Button
-                android:id="@+id/b1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/SHRADDHA_GHOGARE" />
 
-            <Button
-                android:id="@+id/b2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="mhatre"
-                android:text="@string/SANGEET_PUTHUR" />
-        </LinearLayout>
     </android.support.v4.widget.DrawerLayout>
 
 </RelativeLayout>

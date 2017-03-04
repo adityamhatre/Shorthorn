@@ -4,7 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.thelegacycoder.MyApplication2.Fragments.LoginFragment;
+import com.thelegacycoder.MyApplication2.Fragments.HomeFragment;
 
 /**
  * Created by Aditya on 026, 26 Jan, 2017.
@@ -20,9 +20,9 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return LoginFragment.newInstance("Login");
+                return HomeFragment.newInstance("Login");
             case 1:
-                return LoginFragment.newInstance("Register");
+                return HomeFragment.newInstance("Register");
             default:
                 return null;
         }
