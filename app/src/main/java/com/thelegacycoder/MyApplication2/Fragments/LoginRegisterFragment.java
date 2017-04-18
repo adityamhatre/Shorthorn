@@ -3,7 +3,6 @@ package com.thelegacycoder.MyApplication2.Fragments;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -72,15 +71,7 @@ public class LoginRegisterFragment extends Fragment {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabTextColors(Color.WHITE, Color.WHITE);
 
-
-        new Handler().postDelayed(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        tabLayout.getTabAt(mode).select();
-                    }
-                }, 100);
-
+        tabLayout.getTabAt(mode).select();
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
