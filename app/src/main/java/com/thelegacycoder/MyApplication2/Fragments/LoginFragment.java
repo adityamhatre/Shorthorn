@@ -8,7 +8,10 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
+import com.thelegacycoder.MyApplication2.Controllers.LoginController;
 import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.MyApplication2.R;
 
@@ -18,20 +21,16 @@ public class LoginFragment extends Fragment {
 
     private String mParam1;
     private String mParam2;
+    private String email = "", password = "";
+
+    private Button loginButton;
+    private EditText emailInput, passwordInput;
+    private LoginController loginController;
 
     private OnFragmentInteractionListener mListener;
 
     public LoginFragment() {
         // Required empty public constructor
-    }
-
-    public static LoginFragment newInstance(String param1, String param2) {
-        LoginFragment fragment = new LoginFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
 
     public static LoginFragment newInstance() {
@@ -61,8 +60,26 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //((TextView) view.findViewById(R.id.text)).setText(mParam1);
 
+        init(view);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                email = emailInput.getText().toString().trim();
+                password = passwordInput.getText().toString().trim();
+                loginController.login(email, password);
+            }
+        });
+
+    }
+
+    private void init(View view) {
+        loginController = LoginController.newInstance();
+
+        loginButton = (Button) view.findViewById(R.id.btn_login);
+        emailInput = (EditText) view.findViewById(R.id.input_email);
+        passwordInput = (EditText) view.findViewById(R.id.input_password);
     }
 
     public void onButtonPressed(Uri uri) {
