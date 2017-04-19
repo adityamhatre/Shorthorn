@@ -3,6 +3,7 @@ package com.thelegacycoder.MyApplication2.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ public class LoginFragment extends Fragment {
     private EditText emailInput, passwordInput;
     private LoginController loginController;
 
+    private View shader;
     private OnFragmentInteractionListener mListener;
 
     public LoginFragment() {
@@ -68,18 +70,43 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 email = emailInput.getText().toString().trim();
                 password = passwordInput.getText().toString().trim();
+
+                displayLoading(3);
                 loginController.login(email, password);
+
+
             }
         });
 
     }
 
+    private void displayLoading(int countDown) {
+        Handler h = new Handler();
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                emailInput.setEnabled(true);
+                passwordInput.setEnabled(true);
+                shader.setVisibility(View.GONE);
+                loginButton.setBackgroundTintList(getResources().getColorStateList(R.color.green));
+                loginButton.setText("Success");
+            }
+        };
+
+        emailInput.setEnabled(false);
+        passwordInput.setEnabled(false);
+        shader.setVisibility(View.VISIBLE);
+        h.postDelayed(r, countDown * 1000);
+    }
+
     private void init(View view) {
         loginController = LoginController.newInstance();
 
-        loginButton = (Button) view.findViewById(R.id.btn_login);
+        loginButton = (Button) view.findViewById(R.id.btn_register);
         emailInput = (EditText) view.findViewById(R.id.input_email);
         passwordInput = (EditText) view.findViewById(R.id.input_password);
+
+        shader = view.findViewById(R.id.shader);
     }
 
     public void onButtonPressed(Uri uri) {

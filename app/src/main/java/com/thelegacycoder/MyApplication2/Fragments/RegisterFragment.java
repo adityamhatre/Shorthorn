@@ -3,18 +3,23 @@ package com.thelegacycoder.MyApplication2.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 
+import com.thelegacycoder.MyApplication2.Controllers.RegisterController;
 import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.MyApplication2.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link RegisterFragment.OnFragmentInteractionListener} interface
+ * {@link com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link RegisterFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -29,29 +34,24 @@ public class RegisterFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private String email = "", password = "", confirmPassword = "";
+
+    private Button registerButton;
+    private EditText emailInput, passwordInput, confirmPasswordInput;
+    private RegisterController registerController;
+
+    private View shader;
     private OnFragmentInteractionListener mListener;
+
+    //  private View.OnTouchListener onTouchListener, nullTouchListener;
+
+    //private View rootView;
+
 
     public RegisterFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LoginFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static RegisterFragment newInstance(String param1, String param2) {
-        RegisterFragment fragment = new RegisterFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     public static RegisterFragment newInstance() {
         return new RegisterFragment();
@@ -77,6 +77,74 @@ public class RegisterFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // rootView = view;
+        init(view);
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                email = emailInput.getText().toString().trim();
+                password = passwordInput.getText().toString().trim();
+                confirmPassword = confirmPasswordInput.getText().toString().trim();
+                displayLoading(3);
+                registerController.register(email, password);
+
+
+            }
+        });
+    }
+
+    private void displayLoading(int countDown) {
+        Handler h = new Handler();
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                emailInput.setEnabled(true);
+                passwordInput.setEnabled(true);
+                shader.setVisibility(View.GONE);
+                registerButton.setBackgroundTintList(getResources().getColorStateList(R.color.green));
+                registerButton.setText("Success");
+                //  ((ViewPager) rootView.getParent()).setOnTouchListener(onTouchListener);
+            }
+        };
+
+        emailInput.setEnabled(false);
+        passwordInput.setEnabled(false);
+        shader.setVisibility(View.VISIBLE);
+        // ((ViewPager) rootView.getParent()).setOnTouchListener(nullTouchListener);
+
+        h.postDelayed(r, countDown * 1000);
+    }
+
+    private void init(View view) {
+        registerController = RegisterController.newInstance();
+
+        registerButton = (Button) view.findViewById(R.id.btn_register);
+        emailInput = (EditText) view.findViewById(R.id.input_email);
+        passwordInput = (EditText) view.findViewById(R.id.input_password);
+        confirmPasswordInput = (EditText) view.findViewById(R.id.input_confirm_password);
+
+        shader = view.findViewById(R.id.shader);
+
+       /* nullTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        };
+        onTouchListener = new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return false;
+            }
+        };*/
+
+
     }
 
     @Override
