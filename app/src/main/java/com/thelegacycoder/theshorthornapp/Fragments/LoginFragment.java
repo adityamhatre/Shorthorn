@@ -3,7 +3,6 @@ package com.thelegacycoder.theshorthornapp.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.R;
@@ -24,11 +24,12 @@ public class LoginFragment extends Fragment {
     private String mParam2;
     private String email = "", password = "";
 
-    private Button loginButton;
-    private EditText emailInput, passwordInput;
+
+    private static Button loginButton;
+    private static EditText emailInput, passwordInput;
     private LoginController loginController;
 
-    private View shader;
+    private static View shader;
     private OnFragmentInteractionListener mListener;
 
     public LoginFragment() {
@@ -71,7 +72,7 @@ public class LoginFragment extends Fragment {
                 email = emailInput.getText().toString().trim();
                 password = passwordInput.getText().toString().trim();
 
-                displayLoading(3);
+                displayLoading();
                 loginController.login(email, password);
 
 
@@ -80,27 +81,35 @@ public class LoginFragment extends Fragment {
 
     }
 
-    private void displayLoading(int countDown) {
-        Handler h = new Handler();
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                emailInput.setEnabled(true);
-                passwordInput.setEnabled(true);
-                shader.setVisibility(View.GONE);
-                loginButton.setBackgroundTintList(getResources().getColorStateList(R.color.green));
-                loginButton.setText("Success");
-            }
-        };
+    private void displayLoading() {
+
 
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         shader.setVisibility(View.VISIBLE);
-        h.postDelayed(r, countDown * 1000);
+
+    }
+
+    private static void hideLoading() {
+        emailInput.setEnabled(true);
+        passwordInput.setEnabled(true);
+        shader.setVisibility(View.GONE);
+    }
+
+    public static void loginCallback(boolean loginResult) {
+        hideLoading();
+        if (loginResult) {
+            loginButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.green));
+            loginButton.setText("Login successful");
+        } else {
+            loginButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.red));
+            loginButton.setText("Error Occured");
+        }
+
     }
 
     private void init(View view) {
-        loginController = LoginController.newInstance();
+        loginController = LoginController.newInstance(getActivity());
 
         loginButton = (Button) view.findViewById(R.id.btn_register);
         emailInput = (EditText) view.findViewById(R.id.input_email);

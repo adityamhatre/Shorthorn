@@ -3,7 +3,6 @@ package com.thelegacycoder.theshorthornapp.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Controllers.RegisterController;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.R;
@@ -36,11 +37,11 @@ public class RegisterFragment extends Fragment {
 
     private String email = "", password = "", confirmPassword = "";
 
-    private Button registerButton;
-    private EditText emailInput, passwordInput, confirmPasswordInput;
+    private static Button registerButton;
+    private static EditText emailInput, passwordInput, confirmPasswordInput;
     private RegisterController registerController;
 
-    private View shader;
+    private static View shader;
     private OnFragmentInteractionListener mListener;
 
 
@@ -90,36 +91,43 @@ public class RegisterFragment extends Fragment {
                 email = emailInput.getText().toString().trim();
                 password = passwordInput.getText().toString().trim();
                 confirmPassword = confirmPasswordInput.getText().toString().trim();
-                displayLoading(3);
-                registerController.register(email, password);
+                if (password.equalsIgnoreCase(confirmPassword))
+                    if (password.length() >= 8) {
+                        displayLoading();
+                        registerController.register(email, password);
+                    } else showShortLengthError();
+                else showPasswordNotMatchingError();
 
 
             }
         });
     }
 
-    private void displayLoading(int countDown) {
-        Handler h = new Handler();
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                emailInput.setEnabled(true);
-                passwordInput.setEnabled(true);
-                shader.setVisibility(View.GONE);
-                registerButton.setBackgroundTintList(getResources().getColorStateList(R.color.green));
-                registerButton.setText("Success");
-            }
-        };
+    private void showPasswordNotMatchingError() {
+        Toast.makeText(getActivity(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showShortLengthError() {
+        Toast.makeText(getActivity(), "Password length should be greater than 7 characters", Toast.LENGTH_SHORT).show();
+    }
+
+    private void displayLoading() {
+
 
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         shader.setVisibility(View.VISIBLE);
 
-        h.postDelayed(r, countDown * 1000);
+    }
+
+    private static void hideLoading() {
+        emailInput.setEnabled(true);
+        passwordInput.setEnabled(true);
+        shader.setVisibility(View.GONE);
     }
 
     private void init(View view) {
-        registerController = RegisterController.newInstance();
+        registerController = RegisterController.newInstance(getActivity());
 
         registerButton = (Button) view.findViewById(R.id.btn_register);
         emailInput = (EditText) view.findViewById(R.id.input_email);
@@ -127,6 +135,19 @@ public class RegisterFragment extends Fragment {
         confirmPasswordInput = (EditText) view.findViewById(R.id.input_confirm_password);
 
         shader = view.findViewById(R.id.shader);
+
+    }
+
+
+    public static void registerCallback(boolean registerCallback) {
+        hideLoading();
+        if (registerCallback) {
+            registerButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.green));
+            registerButton.setText("Succesfully registered");
+        } else {
+            registerButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.red));
+            registerButton.setText("Error Occured");
+        }
 
     }
 

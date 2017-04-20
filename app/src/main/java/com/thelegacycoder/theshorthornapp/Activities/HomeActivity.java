@@ -12,9 +12,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
@@ -23,11 +28,14 @@ import com.thelegacycoder.theshorthornapp.R;
 public class HomeActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
 
-    DrawerLayout drawerLayout;
-    Class currentFragment = LoginRegisterFragment.class;
-    Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private Class currentFragment = LoginRegisterFragment.class;
+    private Toolbar toolbar;
 
-    NavigationView navigationView;
+    private static NavigationView navigationView;
+    private static FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +49,21 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
         changeFragment(HomeFragment.newInstance("Welcome"));
 
+        mAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(currentFragment.getSimpleName(), "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(currentFragment.getSimpleName(), "onAuthStateChanged:signed_out");
+                }
+            }
+        };
+
     }
 
     private void setListeners() {
@@ -52,10 +75,16 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
                 switch (item.getItemId()) {
                     case R.id.drawer_item_login:
-                        changeFragment(LoginRegisterFragment.newInstance(0));
+                        if (!AppController.getInstance().isLoggedIn())
+                            changeFragment(LoginRegisterFragment.newInstance(0));
+                        else
+                            Toast.makeText(HomeActivity.this, "Already logged in", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.drawer_item_register:
-                        changeFragment(LoginRegisterFragment.newInstance(1));
+                        if (!AppController.getInstance().isLoggedIn())
+                            changeFragment(LoginRegisterFragment.newInstance(1));
+                        else
+                            Toast.makeText(HomeActivity.this, "Already logged in", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.drawer_item_home:
                         changeFragment(HomeFragment.newInstance("Welcome"));
@@ -93,14 +122,14 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     void changeFragment(Fragment fragment) {
         //if (currentFragment != fragment.getClass()) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
-            if (fragmentTransaction != null) {
-                fragmentTransaction.replace(R.id.container, fragment, "tag");
-                fragmentTransaction.commit();
-            }
+        if (fragmentTransaction != null) {
+            fragmentTransaction.replace(R.id.container, fragment, "tag");
+            fragmentTransaction.commit();
+        }
 
-            currentFragment = fragment.getClass();
+        currentFragment = fragment.getClass();
         //}
         closeDrawer();
         invalidateOptionsMenu();
@@ -132,5 +161,27 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mAuthStateListener != null) {
+            mAuth.removeAuthStateListener(mAuthStateListener);
+        }
+    }
+
+    public static FirebaseAuth getmAuth() {
+        return mAuth;
+    }
+
+    public static NavigationView getNavigationView() {
+        return navigationView;
     }
 }
