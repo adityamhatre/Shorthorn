@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
+import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.R;
@@ -151,12 +152,22 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        if (currentFragment != HomeFragment.class)
+        if (currentFragment != HomeFragment.class) {
             menu.add("Help")
                     .setIcon(android.R.drawable.ic_menu_help)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            if (AppController.getInstance().isLoggedIn())
+                menu.add("Logout").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        LoginFragment.getLoginController().logout();
+                        return false;
+                    }
+                }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
         return super.onCreateOptionsMenu(menu);
     }
+
 
     @Override
     public void onFragmentInteraction(Uri uri) {

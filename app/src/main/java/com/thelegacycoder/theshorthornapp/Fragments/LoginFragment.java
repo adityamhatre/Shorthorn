@@ -27,7 +27,7 @@ public class LoginFragment extends Fragment {
 
     private static Button loginButton;
     private static EditText emailInput, passwordInput;
-    private LoginController loginController;
+    private static LoginController loginController;
 
     private static View shader;
     private OnFragmentInteractionListener mListener;
@@ -141,4 +141,7 @@ public class LoginFragment extends Fragment {
     }
 
 
+    public static LoginController getLoginController() {
+        return loginController;
+    }
 }

@@ -3,8 +3,6 @@ package com.thelegacycoder.theshorthornapp.Application;
 import android.app.Application;
 import android.content.Context;
 
-import com.thelegacycoder.theshorthornapp.Activities.HomeActivity;
-
 /**
  * Created by Aditya on 018, 18 Apr, 2017.
  */
@@ -38,17 +36,7 @@ public class AppController extends Application {
 
     public void setLoggedIn(boolean loggedIn) {
         this.loggedIn = loggedIn;
-        if (loggedIn)
-            if (HomeActivity.getNavigationView() != null) {
-                //:TODO remove login and register from navigation view once login !. :P
-                /*
-                * Note from past-Aditya to future-Aditya:
-                * Hey you... kahi tari vichar karun ithe he statements taaklet..jasta v4 nako karu and ithech implement kar je var lihle
-                * Aani anghol kar aaj :P
-                * Chal bye.
-                * */
-                //HomeActivity.getNavigationView().
-            }
+
     }
 
 }
