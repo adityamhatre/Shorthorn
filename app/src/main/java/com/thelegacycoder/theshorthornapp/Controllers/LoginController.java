@@ -32,11 +32,6 @@ public class LoginController {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-
                         if (task.isSuccessful()) {
                             LoginFragment.loginCallback(true);
                             AppController.getInstance().setLoggedIn(true);
@@ -50,8 +45,6 @@ public class LoginController {
                             Log.w(TAG, "signInWithEmail:failed", task.getException());
                             LoginFragment.loginCallback(false);
                         }
-
-                        // ...
                     }
                 });
     }
@@ -61,6 +54,11 @@ public class LoginController {
         AppController.getInstance().setLoggedIn(false);
         HomeActivity.getNavigationView().getMenu().clear();
         HomeActivity.getNavigationView().inflateMenu(R.menu.nav_items);
+
+
+        //TODO: this is not yet tested...baghun ghe device var run karun
+        //TODO: ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+        HomeActivity.getNavigationView().setCheckedItem(0);
 
         return true;
     }
