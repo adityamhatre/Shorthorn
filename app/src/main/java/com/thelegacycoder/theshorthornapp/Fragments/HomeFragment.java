@@ -1,4 +1,4 @@
-package com.thelegacycoder.MyApplication2.Fragments;
+package com.thelegacycoder.theshorthornapp.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,8 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
-import com.thelegacycoder.MyApplication2.R;
+import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
+import com.thelegacycoder.theshorthornapp.R;
 
 public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";

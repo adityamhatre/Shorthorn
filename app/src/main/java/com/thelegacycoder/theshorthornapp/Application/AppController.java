@@ -1,4 +1,4 @@
-package com.thelegacycoder.MyApplication2.Application;
+package com.thelegacycoder.theshorthornapp.Application;
 
 import android.app.Application;
 

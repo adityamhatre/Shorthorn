@@ -1,4 +1,4 @@
-package com.thelegacycoder.MyApplication2.Fragments;
+package com.thelegacycoder.theshorthornapp.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -12,14 +12,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.thelegacycoder.MyApplication2.Controllers.RegisterController;
-import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
-import com.thelegacycoder.MyApplication2.R;
+import com.thelegacycoder.theshorthornapp.Controllers.RegisterController;
+import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
+import com.thelegacycoder.theshorthornapp.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener} interface
+ * {@link com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link RegisterFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -43,7 +43,6 @@ public class RegisterFragment extends Fragment {
     private View shader;
     private OnFragmentInteractionListener mListener;
 
-    //  private View.OnTouchListener onTouchListener, nullTouchListener;
 
     //private View rootView;
 
@@ -109,14 +108,12 @@ public class RegisterFragment extends Fragment {
                 shader.setVisibility(View.GONE);
                 registerButton.setBackgroundTintList(getResources().getColorStateList(R.color.green));
                 registerButton.setText("Success");
-                //  ((ViewPager) rootView.getParent()).setOnTouchListener(onTouchListener);
             }
         };
 
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         shader.setVisibility(View.VISIBLE);
-        // ((ViewPager) rootView.getParent()).setOnTouchListener(nullTouchListener);
 
         h.postDelayed(r, countDown * 1000);
     }
@@ -130,20 +127,6 @@ public class RegisterFragment extends Fragment {
         confirmPasswordInput = (EditText) view.findViewById(R.id.input_confirm_password);
 
         shader = view.findViewById(R.id.shader);
-
-       /* nullTouchListener = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        };
-        onTouchListener = new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return false;
-            }
-        };*/
-
 
     }
 

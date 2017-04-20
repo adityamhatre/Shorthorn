@@ -1,8 +1,8 @@
-package com.thelegacycoder.MyApplication2.Controllers;
+package com.thelegacycoder.theshorthornapp.Controllers;
 
-import com.thelegacycoder.MyApplication2.Application.AppController;
-import com.thelegacycoder.MyApplication2.AsyncTasks.LoginAsyncTask;
-import com.thelegacycoder.MyApplication2.Interfaces.AsyncCallback;
+import com.thelegacycoder.theshorthornapp.Application.AppController;
+import com.thelegacycoder.theshorthornapp.AsyncTasks.LoginAsyncTask;
+import com.thelegacycoder.theshorthornapp.Interfaces.AsyncCallback;
 
 /**
  * Created by Aditya on 018, 18 Apr, 2017.

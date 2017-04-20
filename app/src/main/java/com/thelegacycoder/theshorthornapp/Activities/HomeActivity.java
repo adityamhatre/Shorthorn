@@ -1,4 +1,4 @@
-package com.thelegacycoder.MyApplication2.Activities;
+package com.thelegacycoder.theshorthornapp.Activities;
 
 import android.graphics.Color;
 import android.net.Uri;
@@ -15,10 +15,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.thelegacycoder.MyApplication2.Fragments.HomeFragment;
-import com.thelegacycoder.MyApplication2.Fragments.LoginRegisterFragment;
-import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
-import com.thelegacycoder.MyApplication2.R;
+import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
+import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
+import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
+import com.thelegacycoder.theshorthornapp.R;
 
 public class HomeActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 

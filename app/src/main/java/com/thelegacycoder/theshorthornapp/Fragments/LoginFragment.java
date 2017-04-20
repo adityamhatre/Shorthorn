@@ -1,4 +1,4 @@
-package com.thelegacycoder.MyApplication2.Fragments;
+package com.thelegacycoder.theshorthornapp.Fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.thelegacycoder.MyApplication2.Controllers.LoginController;
-import com.thelegacycoder.MyApplication2.Interfaces.OnFragmentInteractionListener;
-import com.thelegacycoder.MyApplication2.R;
+import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
+import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
+import com.thelegacycoder.theshorthornapp.R;
 
 public class LoginFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";

@@ -1,11 +1,11 @@
-package com.thelegacycoder.MyApplication2.Adapters;
+package com.thelegacycoder.theshorthornapp.Adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.thelegacycoder.MyApplication2.Fragments.LoginFragment;
-import com.thelegacycoder.MyApplication2.Fragments.RegisterFragment;
+import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
+import com.thelegacycoder.theshorthornapp.Fragments.RegisterFragment;
 
 /**
  * Created by Aditya on 026, 26 Jan, 2017.

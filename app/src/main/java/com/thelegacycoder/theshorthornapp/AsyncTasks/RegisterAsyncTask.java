@@ -1,9 +1,9 @@
-package com.thelegacycoder.MyApplication2.AsyncTasks;
+package com.thelegacycoder.theshorthornapp.AsyncTasks;
 
 import android.os.AsyncTask;
 
-import com.thelegacycoder.MyApplication2.Application.AppController;
-import com.thelegacycoder.MyApplication2.Interfaces.AsyncCallback;
+import com.thelegacycoder.theshorthornapp.Application.AppController;
+import com.thelegacycoder.theshorthornapp.Interfaces.AsyncCallback;
 
 /**
  * Created by Aditya on 019, 19 Apr, 2017.
