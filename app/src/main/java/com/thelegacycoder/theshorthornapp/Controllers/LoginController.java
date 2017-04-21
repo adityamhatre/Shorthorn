@@ -11,7 +11,6 @@ import com.google.firebase.auth.AuthResult;
 import com.thelegacycoder.theshorthornapp.Activities.HomeActivity;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
-import com.thelegacycoder.theshorthornapp.R;
 
 import static com.google.android.gms.internal.zzs.TAG;
 
@@ -35,10 +34,7 @@ public class LoginController {
                         if (task.isSuccessful()) {
                             LoginFragment.loginCallback(true);
                             AppController.getInstance().setLoggedIn(true);
-                            if (HomeActivity.getNavigationView() != null) {
-                                HomeActivity.getNavigationView().getMenu().removeItem(1);
-                                HomeActivity.getNavigationView().getMenu().removeItem(2);
-                            }
+                            ((HomeActivity) context).loginCallback(true);
                         }
 
                         if (!task.isSuccessful()) {
@@ -52,14 +48,7 @@ public class LoginController {
     public boolean logout() {
         HomeActivity.getmAuth().signOut();
         AppController.getInstance().setLoggedIn(false);
-        HomeActivity.getNavigationView().getMenu().clear();
-        HomeActivity.getNavigationView().inflateMenu(R.menu.nav_items);
-
-
-        //TODO: this is not yet tested...baghun ghe device var run karun
-        //TODO: ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-        HomeActivity.getNavigationView().setCheckedItem(0);
-
+        ((HomeActivity) context).logoutCallback();
         return true;
     }
 

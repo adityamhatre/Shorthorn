@@ -150,21 +150,35 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
         }
     }
 
+    public void loginCallback(boolean loginResult) {
+        if (loginResult) {
+            navigationView.getMenu().getItem(0).setChecked(true);
+            navigationView.getMenu().findItem(R.id.drawer_item_login).setVisible(false);
+            navigationView.getMenu().findItem(R.id.drawer_item_register).setVisible(false);
+
+            changeFragment(HomeFragment.newInstance("Welcome, user: " + mAuth.getCurrentUser().getEmail()));
+            invalidateOptionsMenu();
+        } else {
+        }
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (currentFragment != HomeFragment.class) {
             menu.add("Help")
                     .setIcon(android.R.drawable.ic_menu_help)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            if (AppController.getInstance().isLoggedIn())
-                menu.add("Logout").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        LoginFragment.getLoginController().logout();
-                        return false;
-                    }
-                }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
+        if (AppController.getInstance().isLoggedIn())
+            menu.add("Logout").setIcon(android.R.drawable.btn_minus).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    LoginFragment.getLoginController().logout();
+                    return false;
+                }
+            }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -194,5 +208,11 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     public static NavigationView getNavigationView() {
         return navigationView;
+    }
+
+    public void logoutCallback() {
+        navigationView.getMenu().findItem(R.id.drawer_item_login).setVisible(true);
+        navigationView.getMenu().findItem(R.id.drawer_item_register).setVisible(true);
+        invalidateOptionsMenu();
     }
 }

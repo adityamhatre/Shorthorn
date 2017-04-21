@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "386097136064",
+    "firebase_url": "https://the-shorthorn-app.firebaseio.com",
+    "project_id": "the-shorthorn-app",
+    "storage_bucket": "the-shorthorn-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:386097136064:android:72fbf5dd7f4cddd2",
+        "android_client_info": {
+          "package_name": "com.thelegacycoder.theshorthornapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "386097136064-s25kscecnuss9svf3hfq7ohluurpr8n0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.thelegacycoder.theshorthornapp",
+            "certificate_hash": "987971983ef927779f8c6327539b0159a42c5cb5"
+          }
+        },
+        {
+          "client_id": "386097136064-ianol3h90sd4i77a6seq8mfj6jj3cvsn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSJNYeLTKxx3gbuVxcpychuLEUYipJOh4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "386097136064-ianol3h90sd4i77a6seq8mfj6jj3cvsn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
