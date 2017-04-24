@@ -57,7 +57,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         ImageView image;
         Button reportButton, shareButton, likeButton;
 
-        ViewHolder(View itemView) {
+        ViewHolder(final View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.title);
             // description = (TextView) itemView.findViewById(R.id.description);
@@ -71,19 +71,19 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             reportButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onReportClick(view, articles.get(getAdapterPosition()));
+                    clickHandler.onReportClick(articles.get(getAdapterPosition()));
                 }
             });
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onShareClick(view, articles.get(getAdapterPosition()));
+                    clickHandler.onShareClick(itemView, articles.get(getAdapterPosition()));
                 }
             });
             likeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onLikeClick(view, articles.get(getAdapterPosition()));
+                    clickHandler.onLikeClick((Button) view, articles.get(getAdapterPosition()));
                 }
             });
 
@@ -92,10 +92,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     }
 
     public interface ClickHandler {
-        void onReportClick(View view, Article article);
+        void onReportClick(Article article);
 
         void onShareClick(View view, Article article);
 
-        void onLikeClick(View view, Article article);
+        void onLikeClick(Button likeButton, Article article);
     }
 }

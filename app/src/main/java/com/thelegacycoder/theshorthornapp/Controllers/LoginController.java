@@ -45,6 +45,26 @@ public class LoginController {
                 });
     }
 
+    public void login(String email, String password, Boolean callBack) {
+        if (!callBack)
+            AppController.getInstance().getmAuth().signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+                            if (task.isSuccessful()) {
+                                AppController.getInstance().setLoggedIn(true);
+                                ((HomeActivity) context).loginCallback(true);
+                            }
+
+                            if (!task.isSuccessful()) {
+                                Log.w(TAG, "signInWithEmail:failed", task.getException());
+
+                            }
+                        }
+                    });
+    }
+
     public boolean logout() {
         AppController.getInstance().getmAuth().signOut();
         AppController.getInstance().setLoggedIn(false);

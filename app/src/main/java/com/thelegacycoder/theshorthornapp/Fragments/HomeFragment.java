@@ -1,8 +1,14 @@
 package com.thelegacycoder.theshorthornapp.Fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -22,6 +29,7 @@ import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListen
 import com.thelegacycoder.theshorthornapp.Models.Article;
 import com.thelegacycoder.theshorthornapp.R;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -80,6 +88,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //((TextView) view.findViewById(R.id.text)).setText(mParam1);
+
         if (AppController.getInstance().isLoggedIn()) {
             Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
             final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
@@ -94,6 +103,7 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
+                    articles.clear();
                     for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                         articles.add(postSnapshot.getValue(Article.class));
                     }
@@ -101,15 +111,46 @@ public class HomeFragment extends Fragment {
                     Collections.reverse(articles);
                     recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
                         @Override
-                        public void onReportClick(View view, Article article) {
+                        public void onReportClick(Article article) {
+
                         }
 
                         @Override
                         public void onShareClick(View view, Article article) {
+                            view.findViewById(R.id.share_button).setVisibility(View.GONE);
+                            view.findViewById(R.id.like_button).setVisibility(View.GONE);
+                            view.findViewById(R.id.report_button).setVisibility(View.GONE);
+
+                            Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+                            Canvas canvas = new Canvas(returnedBitmap);
+                            Drawable bgDrawable = view.getBackground();
+                            if (bgDrawable != null)
+                                bgDrawable.draw(canvas);
+                            else
+                                canvas.drawColor(Color.WHITE);
+                            view.draw(canvas);
+
+                            ByteArrayOutputStream os = new ByteArrayOutputStream();
+                            returnedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                            String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), returnedBitmap, null, null);
+                            Uri uri = Uri.parse(path);
+
+                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                            shareIntent.setAction(Intent.ACTION_SEND);
+                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                            shareIntent.setType("text/plain");
+                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                            shareIntent.setType("image/*");
+                            getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
+                            /*view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.like_button).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.report_button).setVisibility(View.VISIBLE);*/
                         }
 
                         @Override
-                        public void onLikeClick(View view, Article article) {
+                        public void onLikeClick(Button likeButton, Article article) {
+                            AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").push().setValue(article.getAuthor());
                         }
                     }));
                 }

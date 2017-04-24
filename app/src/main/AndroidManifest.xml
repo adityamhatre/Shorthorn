@@ -3,7 +3,7 @@
     package="com.thelegacycoder.theshorthornapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:name="com.thelegacycoder.theshorthornapp.Application.AppController"
         android:allowBackup="true"

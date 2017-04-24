@@ -81,9 +81,8 @@ public class LoginFragment extends Fragment {
 
     }
 
+
     private void displayLoading() {
-
-
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         shader.setVisibility(View.VISIBLE);

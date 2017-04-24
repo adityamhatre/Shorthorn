@@ -1,7 +1,10 @@
 package com.thelegacycoder.theshorthornapp.Activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -17,6 +20,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.thelegacycoder.theshorthornapp.Application.AppController;
+import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
@@ -43,10 +47,36 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
         setListeners();
 
 
+        System.out.println("here");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            System.out.println("in if");
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
+        }
+
+        LoginController.newInstance(this).login("a@a.com", "asdfasdf", false);
+
+
         changeFragment(HomeFragment.newInstance("Welcome"));
 
 
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 12321:
+                if (grantResults[0] != PackageManager.PERMISSION_GRANTED)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
+                    }
+                break;
+            default:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
+                }
+                break;
+        }
     }
 
     private void setListeners() {
