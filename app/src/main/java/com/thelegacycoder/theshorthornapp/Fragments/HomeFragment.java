@@ -23,6 +23,7 @@ import com.thelegacycoder.theshorthornapp.Models.Article;
 import com.thelegacycoder.theshorthornapp.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
@@ -79,39 +80,49 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         //((TextView) view.findViewById(R.id.text)).setText(mParam1);
+        if (AppController.getInstance().isLoggedIn()) {
+            Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
+            final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+            recyclerView.setHasFixedSize(true);
+            LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            recyclerView.setLayoutManager(llm);
+            final ArrayList<Article> articles = new ArrayList<>();
 
-        Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(llm);
-        final ArrayList<Article> articles = new ArrayList<>();
 
+            AppController.getInstance().getDatabase().getReference("articles").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
 
-        AppController.getInstance().getDatabase().getReference("articles").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        articles.add(postSnapshot.getValue(Article.class));
+                    }
 
-                String title, description, author;
-                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                    articles.add(postSnapshot.getValue(Article.class));
+                    Collections.reverse(articles);
+                    recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+                        @Override
+                        public void onReportClick(View view, Article article) {
+                        }
+
+                        @Override
+                        public void onShareClick(View view, Article article) {
+                        }
+
+                        @Override
+                        public void onLikeClick(View view, Article article) {
+                        }
+                    }));
                 }
 
-                recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
-                    @Override
-                    public void onClick(View view, Article article) {
-                        System.out.println("clicked");
-                    }
-                }));
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                }
+            });
 
-            }
-        });
-
+        } else {
+            view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
+        }
     }
 
 

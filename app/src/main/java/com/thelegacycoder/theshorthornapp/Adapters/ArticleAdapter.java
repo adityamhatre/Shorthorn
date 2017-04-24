@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -51,9 +52,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     }
 
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, description, author;
         ImageView image;
+        Button reportButton, shareButton, likeButton;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -62,17 +64,38 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             author = (TextView) itemView.findViewById(R.id.author);
             image = (ImageView) itemView.findViewById(R.id.image);
 
-            itemView.setOnClickListener(this);
+            reportButton = (Button) itemView.findViewById(R.id.report_button);
+            likeButton = (Button) itemView.findViewById(R.id.like_button);
+            shareButton = (Button) itemView.findViewById(R.id.share_button);
+
+            reportButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onReportClick(view, articles.get(getAdapterPosition()));
+                }
+            });
+            shareButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onShareClick(view, articles.get(getAdapterPosition()));
+                }
+            });
+            likeButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onLikeClick(view, articles.get(getAdapterPosition()));
+                }
+            });
 
         }
 
-        @Override
-        public void onClick(View view) {
-            clickHandler.onClick(view, articles.get(getAdapterPosition()));
-        }
     }
 
     public interface ClickHandler {
-        void onClick(View view, Article article);
+        void onReportClick(View view, Article article);
+
+        void onShareClick(View view, Article article);
+
+        void onLikeClick(View view, Article article);
     }
 }
