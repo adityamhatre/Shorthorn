@@ -14,6 +14,9 @@ public class Article {
         this.imageLink = imageLink;
     }
 
+    public Article() {
+    }
+
     public String getTitle() {
         return title;
     }

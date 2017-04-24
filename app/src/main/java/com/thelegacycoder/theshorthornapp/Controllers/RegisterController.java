@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.thelegacycoder.theshorthornapp.Activities.HomeActivity;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Fragments.RegisterFragment;
 
@@ -42,9 +43,9 @@ public class RegisterController {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-
                                 RegisterFragment.registerCallback(true);
                                 AppController.getInstance().setLoggedIn(true);
+                                ((HomeActivity) context).loginCallback(true);
                             } else {
                                 System.out.println("failed");
                                 RegisterFragment.registerCallback(false);

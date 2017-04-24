@@ -11,8 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.thelegacycoder.theshorthornapp.Adapters.ArticleAdapter;
+import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.Models.Article;
 import com.thelegacycoder.theshorthornapp.R;
@@ -57,6 +62,8 @@ public class HomeFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+
     }
 
     @Override
@@ -73,22 +80,38 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //((TextView) view.findViewById(R.id.text)).setText(mParam1);
 
-
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
+        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(getActivity());
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(llm);
-        ArrayList<Article> articles = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            articles.add(new Article("title" + i, "description" + i, "author" + i, "imageLink" + i));
-        }
-        recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+        final ArrayList<Article> articles = new ArrayList<>();
+
+
+        AppController.getInstance().getDatabase().getReference("articles").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View view, Article article) {
-                System.out.println("clicked");
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String title, description, author;
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    articles.add(postSnapshot.getValue(Article.class));
+                }
+
+                recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+                    @Override
+                    public void onClick(View view, Article article) {
+                        System.out.println("clicked");
+                    }
+                }));
             }
-        }));
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
 
