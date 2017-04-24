@@ -6,22 +6,17 @@ package com.thelegacycoder.theshorthornapp.Models;
 
 public class Article {
     String title, description, author, imageLink;
-    int reportCount;
 
-    public Article(String title, String description, String author, String imageLink, int reportCount) {
+    public Article(String title, String description, String author, String imageLink) {
         this.title = title;
         this.description = description;
         this.author = author;
         this.imageLink = imageLink;
-        this.reportCount = reportCount;
     }
 
     public Article() {
     }
 
-    public int getReportCount() {
-        return reportCount;
-    }
 
     public String getTitle() {
         return title;

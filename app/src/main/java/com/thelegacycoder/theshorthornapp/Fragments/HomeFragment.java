@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +21,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -113,7 +116,28 @@ public class HomeFragment extends Fragment {
                     articleAdapter = new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
                         @Override
                         public void onReportClick(Article article, int position) {
+                            position = articles.size() - position;
+                            final int finalPosition = position;
+                            AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + position).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    int reportCount = dataSnapshot.getValue(Integer.class);
+                                    reportCount++;
+                                    AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + finalPosition).setValue(reportCount).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                Toast.makeText(getActivity(), "Reported article", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
 
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
                         }
 
                         @Override

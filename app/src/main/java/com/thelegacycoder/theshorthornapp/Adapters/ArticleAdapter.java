@@ -62,7 +62,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ArticleAdapter.ViewHolder holder, int position) {
-        System.out.println("binding to position " + position);
         holder.bind(position);
     }
 
@@ -117,7 +116,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             if (likesList.contains(articles.size() - position)) {
                 System.out.println("changing to unlike");
                 likeButton.setText("Unlike");
+                likeButton.setTextColor(context.getResources().getColor(R.color.colorAccent));
             } else {
+                likeButton.setTextColor(context.getResources().getColor(android.R.color.white));
                 System.out.println("changing to like");
                 likeButton.setText("Like");
             }
