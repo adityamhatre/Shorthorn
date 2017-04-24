@@ -41,6 +41,7 @@ public class HomeFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private ArticleAdapter articleAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -109,7 +110,7 @@ public class HomeFragment extends Fragment {
                     }
 
                     Collections.reverse(articles);
-                    recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+                    articleAdapter = new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
                         @Override
                         public void onReportClick(Article article, int position) {
 
@@ -151,9 +152,18 @@ public class HomeFragment extends Fragment {
                         @Override
                         public void onLikeClick(Button likeButton, Article article, int position) {
                             position = articles.size() - position;
-                            AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(true);
+                            if (likeButton.getText().toString().equalsIgnoreCase("like")) {
+                                AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(true);
+                            } else {
+                                AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(null);
+                                if (articleAdapter != null) {
+                                    articleAdapter.notifyDataSetChanged();
+                                }
+
+                            }
                         }
-                    }));
+                    });
+                    recyclerView.setAdapter(articleAdapter);
                 }
 
                 @Override
