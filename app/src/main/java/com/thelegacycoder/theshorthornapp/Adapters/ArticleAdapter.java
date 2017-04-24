@@ -9,6 +9,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Models.Article;
 import com.thelegacycoder.theshorthornapp.R;
 
@@ -24,10 +28,30 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     private Context context;
     private ClickHandler clickHandler;
 
+    private ArrayList<Integer> likesList;
+
     public ArticleAdapter(Context context, ArrayList<Article> articles, ClickHandler clickHandler) {
         this.articles = articles;
         this.context = context;
         this.clickHandler = clickHandler;
+        likesList = new ArrayList<>();
+        AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                likesList.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()
+                        ) {
+                    likesList.add(Integer.parseInt(snapshot.getKey().replace("article", "")));
+                }
+                ArticleAdapter.this.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     @Override
@@ -38,15 +62,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ArticleAdapter.ViewHolder holder, int position) {
-        holder.title.setText(articles.get(position).getTitle());
-//        holder.description.setText(articles.get(position).getDescription());
-        holder.author.setText(articles.get(position).getAuthor());
-        //(articles.get(position).getImageLink());
+        System.out.println("binding to position " + position);
+        holder.bind(position);
     }
 
     @Override
     public int getItemCount() {
-        System.out.println(articles.size());
         return articles.size();
 
     }
@@ -71,31 +92,44 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             reportButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onReportClick(articles.get(getAdapterPosition()));
+                    clickHandler.onReportClick(articles.get(getAdapterPosition()), getAdapterPosition());
                 }
             });
             shareButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onShareClick(itemView, articles.get(getAdapterPosition()));
+                    clickHandler.onShareClick(itemView, articles.get(getAdapterPosition()), getAdapterPosition());
                 }
             });
             likeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onLikeClick((Button) view, articles.get(getAdapterPosition()));
+                    clickHandler.onLikeClick((Button) view, articles.get(getAdapterPosition()), getAdapterPosition());
                 }
             });
 
         }
 
+        void bind(int position) {
+            title.setText(articles.get(position).getTitle());
+            author.setText(articles.get(position).getAuthor());
+
+            if (likesList.contains(articles.size() - position)) {
+                System.out.println("changing to unlike");
+                likeButton.setText("Unlike");
+            } else {
+                System.out.println("changing to like");
+                likeButton.setText("Like");
+            }
+        }
+
     }
 
     public interface ClickHandler {
-        void onReportClick(Article article);
+        void onReportClick(Article article, int position);
 
-        void onShareClick(View view, Article article);
+        void onShareClick(View view, Article article, int position);
 
-        void onLikeClick(Button likeButton, Article article);
+        void onLikeClick(Button likeButton, Article article, int position);
     }
 }

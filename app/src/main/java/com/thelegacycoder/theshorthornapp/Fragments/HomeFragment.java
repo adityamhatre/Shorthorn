@@ -111,12 +111,12 @@ public class HomeFragment extends Fragment {
                     Collections.reverse(articles);
                     recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
                         @Override
-                        public void onReportClick(Article article) {
+                        public void onReportClick(Article article, int position) {
 
                         }
 
                         @Override
-                        public void onShareClick(View view, Article article) {
+                        public void onShareClick(View view, Article article, int position) {
                             view.findViewById(R.id.share_button).setVisibility(View.GONE);
                             view.findViewById(R.id.like_button).setVisibility(View.GONE);
                             view.findViewById(R.id.report_button).setVisibility(View.GONE);
@@ -143,14 +143,15 @@ public class HomeFragment extends Fragment {
                             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                             shareIntent.setType("image/*");
                             getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
-                            /*view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
+                            view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.like_button).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.report_button).setVisibility(View.VISIBLE);*/
+                            view.findViewById(R.id.report_button).setVisibility(View.VISIBLE);
                         }
 
                         @Override
-                        public void onLikeClick(Button likeButton, Article article) {
-                            AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").push().setValue(article.getAuthor());
+                        public void onLikeClick(Button likeButton, Article article, int position) {
+                            position = articles.size() - position;
+                            AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(true);
                         }
                     }));
                 }
