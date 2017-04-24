@@ -79,6 +79,15 @@
                     android:textColor="#ffffff" />
             </android.support.design.widget.TextInputLayout>
 
+            <Spinner
+                android:id="@+id/login_types"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+
+                android:backgroundTint="@color/colorAccent"
+                android:drawSelectorOnTop="true"
+                android:spinnerMode="dropdown" />
+
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_register"
                 android:layout_width="fill_parent"

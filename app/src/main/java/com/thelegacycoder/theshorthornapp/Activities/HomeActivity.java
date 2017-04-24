@@ -12,13 +12,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
@@ -34,8 +31,6 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
     private Toolbar toolbar;
 
     private static NavigationView navigationView;
-    private static FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
 
 
     @Override
@@ -50,20 +45,7 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
         changeFragment(HomeFragment.newInstance("Welcome"));
 
-        mAuth = FirebaseAuth.getInstance();
-        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(currentFragment.getSimpleName(), "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(currentFragment.getSimpleName(), "onAuthStateChanged:signed_out");
-                }
-            }
-        };
+
 
     }
 
@@ -155,8 +137,7 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             navigationView.getMenu().getItem(0).setChecked(true);
             navigationView.getMenu().findItem(R.id.drawer_item_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.drawer_item_register).setVisible(false);
-
-            changeFragment(HomeFragment.newInstance("Welcome, user: " + mAuth.getCurrentUser().getEmail()));
+            changeFragment(HomeFragment.newInstance("Welcome, user: " + AppController.getInstance().getmAuth().getCurrentUser().getEmail()));
             invalidateOptionsMenu();
         } else {
         }
@@ -170,7 +151,7 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
                     .setIcon(android.R.drawable.ic_menu_help)
                     .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         }
-        if (AppController.getInstance().isLoggedIn())
+        if (AppController.getInstance().isLoggedIn()) {
             menu.add("Logout").setIcon(android.R.drawable.btn_minus).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
@@ -178,7 +159,13 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
                     return false;
                 }
             }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
+            menu.add("Filter").setIcon(android.R.drawable.ic_menu_preferences).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    return false;
+                }
+            }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -191,20 +178,14 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthStateListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mAuthStateListener != null) {
-            mAuth.removeAuthStateListener(mAuthStateListener);
-        }
+
     }
 
-    public static FirebaseAuth getmAuth() {
-        return mAuth;
-    }
 
     public static NavigationView getNavigationView() {
         return navigationView;

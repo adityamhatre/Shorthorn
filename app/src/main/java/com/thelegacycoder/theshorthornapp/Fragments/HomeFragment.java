@@ -1,8 +1,6 @@
 package com.thelegacycoder.theshorthornapp.Fragments;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,12 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import com.alexvasilkov.foldablelayout.UnfoldableView;
-import com.alexvasilkov.foldablelayout.shading.GlanceFoldShading;
 import com.thelegacycoder.theshorthornapp.Adapters.ArticleAdapter;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.Models.Article;
@@ -33,10 +27,6 @@ public class HomeFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    private View listTouchInterceptor;
-    private View detailsLayout;
-    private UnfoldableView unfoldableView;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -83,8 +73,6 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //((TextView) view.findViewById(R.id.text)).setText(mParam1);
 
-        unfoldableView = (UnfoldableView) view.findViewById(R.id.unfoldable_view);
-
 
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -95,62 +83,12 @@ public class HomeFragment extends Fragment {
         for (int i = 0; i < 10; i++) {
             articles.add(new Article("title" + i, "description" + i, "author" + i, "imageLink" + i));
         }
-        recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, unfoldableView, new ArticleAdapter.ClickHandler() {
+        recyclerView.setAdapter(new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
             @Override
             public void onClick(View view, Article article) {
-
-                //::TODO  idk why this is not working...try kar..
-                // TODO also @link {ArticleAdapter.java} madhe onclicklistener ahe..tithe pan bagh..tithe jar child element la click event dila tar animating hote...but root view la kahich nahi hot..maybe override touchintercept thingy...also border la click kela of article la tar crash hoto...urghhhh this is so buggy ....want to try in simple ListView or challenge accept karnar and recycleview madhech karun dakhavnar ?
-                //TODO janne ke liye dekhiye aaj ya kal ka din.
                 System.out.println("clicked");
-                openDetails(view, article);
             }
         }));
-
-
-        listTouchInterceptor = view.findViewById(R.id.touch_interceptor_view);
-        listTouchInterceptor.setClickable(false);
-
-        detailsLayout = view.findViewById(R.id.details_layout);
-        detailsLayout.setVisibility(View.INVISIBLE);
-
-
-        Bitmap glance = BitmapFactory.decodeResource(getResources(), R.drawable.unfold_glance);
-        unfoldableView.setFoldShading(new GlanceFoldShading(glance));
-
-        unfoldableView.setOnFoldingListener(new UnfoldableView.SimpleFoldingListener() {
-            @Override
-            public void onUnfolding(UnfoldableView unfoldableView) {
-                listTouchInterceptor.setClickable(true);
-                detailsLayout.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onUnfolded(UnfoldableView unfoldableView) {
-                listTouchInterceptor.setClickable(false);
-            }
-
-            @Override
-            public void onFoldingBack(UnfoldableView unfoldableView) {
-                listTouchInterceptor.setClickable(true);
-            }
-
-            @Override
-            public void onFoldedBack(UnfoldableView unfoldableView) {
-                listTouchInterceptor.setClickable(false);
-                detailsLayout.setVisibility(View.INVISIBLE);
-            }
-        });
-
-    }
-
-    public void openDetails(View coverView, Article article) {
-        final ImageView image = (ImageView) detailsLayout.findViewById(R.id.details_image);
-        final TextView title = (TextView) detailsLayout.findViewById(R.id.title);
-        final TextView description = (TextView) detailsLayout.findViewById(R.id.description);
-        title.setText(article.getTitle());
-        description.setText(article.getDescription());
-        unfoldableView.unfold(coverView, detailsLayout);
     }
 
 

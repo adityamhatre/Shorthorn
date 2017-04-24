@@ -26,7 +26,7 @@ public class LoginController {
     }
 
     public void login(String email, String password) {
-        HomeActivity.getmAuth().signInWithEmailAndPassword(email, password)
+        AppController.getInstance().getmAuth().signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -46,7 +46,7 @@ public class LoginController {
     }
 
     public boolean logout() {
-        HomeActivity.getmAuth().signOut();
+        AppController.getInstance().getmAuth().signOut();
         AppController.getInstance().setLoggedIn(false);
         ((HomeActivity) context).logoutCallback();
         return true;

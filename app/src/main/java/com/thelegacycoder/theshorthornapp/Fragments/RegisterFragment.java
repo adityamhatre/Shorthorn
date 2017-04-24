@@ -8,14 +8,18 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Controllers.RegisterController;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.R;
+
+import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,10 +39,11 @@ public class RegisterFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private String email = "", password = "", confirmPassword = "";
+    private String email = "", password = "", confirmPassword = "", loginType = "";
 
     private static Button registerButton;
     private static EditText emailInput, passwordInput, confirmPasswordInput;
+    private Spinner loginTypes;
     private RegisterController registerController;
 
     private static View shader;
@@ -83,7 +88,10 @@ public class RegisterFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         // rootView = view;
+
         init(view);
+
+        loginTypes.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.list_item, Arrays.asList(getActivity().getResources().getStringArray(R.array.login_types))));
 
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,10 +99,11 @@ public class RegisterFragment extends Fragment {
                 email = emailInput.getText().toString().trim();
                 password = passwordInput.getText().toString().trim();
                 confirmPassword = confirmPasswordInput.getText().toString().trim();
+                loginType = loginTypes.getSelectedItem().toString();
                 if (password.equalsIgnoreCase(confirmPassword))
                     if (password.length() >= 8) {
                         displayLoading();
-                        registerController.register(email, password);
+                        registerController.register(email, password, loginType);
                     } else showShortLengthError();
                 else showPasswordNotMatchingError();
 
@@ -113,7 +122,6 @@ public class RegisterFragment extends Fragment {
 
     private void displayLoading() {
 
-
         emailInput.setEnabled(false);
         passwordInput.setEnabled(false);
         shader.setVisibility(View.VISIBLE);
@@ -129,6 +137,8 @@ public class RegisterFragment extends Fragment {
     private void init(View view) {
         registerController = RegisterController.newInstance(getActivity());
 
+
+        loginTypes = (Spinner) view.findViewById(R.id.login_types);
         registerButton = (Button) view.findViewById(R.id.btn_register);
         emailInput = (EditText) view.findViewById(R.id.input_email);
         passwordInput = (EditText) view.findViewById(R.id.input_password);
@@ -144,6 +154,7 @@ public class RegisterFragment extends Fragment {
         if (registerCallback) {
             registerButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.green));
             registerButton.setText("Succesfully registered");
+
         } else {
             registerButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.red));
             registerButton.setText("Error Occured");
