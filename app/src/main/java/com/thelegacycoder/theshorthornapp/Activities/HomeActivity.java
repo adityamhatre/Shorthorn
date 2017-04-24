@@ -20,7 +20,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.thelegacycoder.theshorthornapp.Application.AppController;
-import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
@@ -53,7 +52,7 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
         }
 
-        LoginController.newInstance(this).login("a@a.com", "asdfasdf", false);
+//        LoginController.newInstance(this).login("a@a.com", "asdfasdf", false);
 
 
         changeFragment(HomeFragment.newInstance("Welcome"));

@@ -3,6 +3,7 @@ package com.thelegacycoder.theshorthornapp.Fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -103,6 +104,13 @@ public class LoginFragment extends Fragment {
         } else {
             loginButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.red));
             loginButton.setText("Error Occured");
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loginButton.setBackgroundTintList(AppController.getInstance().getContext().getResources().getColorStateList(R.color.colorAccent));
+                    loginButton.setText("Login");
+                }
+            }, 1500);
         }
 
     }
