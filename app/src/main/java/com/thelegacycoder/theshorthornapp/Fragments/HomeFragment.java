@@ -26,6 +26,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.UploadTask;
+import com.thelegacycoder.theshorthornapp.Activities.ViewArticleActivity;
 import com.thelegacycoder.theshorthornapp.Adapters.ArticleAdapter;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
@@ -45,6 +47,7 @@ public class HomeFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ArticleAdapter articleAdapter;
+    private RecyclerView recyclerView;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -93,9 +96,11 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //((TextView) view.findViewById(R.id.text)).setText(mParam1);
 
+        //showFileChooser();
+
         if (AppController.getInstance().isLoggedIn()) {
             Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
-            final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+            recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
             recyclerView.setHasFixedSize(true);
             LinearLayoutManager llm = new LinearLayoutManager(getActivity());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
@@ -121,7 +126,10 @@ public class HomeFragment extends Fragment {
                             AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + position).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    int reportCount = dataSnapshot.getValue(Integer.class);
+                                    int reportCount;
+                                    if (dataSnapshot.getValue() != null) {
+                                        reportCount = dataSnapshot.getValue(Integer.class);
+                                    } else reportCount = 0;
                                     reportCount++;
                                     AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + finalPosition).setValue(reportCount).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
@@ -132,6 +140,7 @@ public class HomeFragment extends Fragment {
                                         }
                                     });
                                 }
+
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
@@ -174,9 +183,9 @@ public class HomeFragment extends Fragment {
                         }
 
                         @Override
-                        public void onLikeClick(Button likeButton, Article article, int position) {
+                        public void onLikeClick(Button likeButton, Article article, int position, boolean liked) {
                             position = articles.size() - position;
-                            if (likeButton.getText().toString().equalsIgnoreCase("like")) {
+                            if (liked) {
                                 AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(true);
                             } else {
                                 AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(null);
@@ -185,6 +194,11 @@ public class HomeFragment extends Fragment {
                                 }
 
                             }
+                        }
+
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            startActivity(new Intent(getActivity(), ViewArticleActivity.class));
                         }
                     });
                     recyclerView.setAdapter(articleAdapter);
@@ -196,11 +210,31 @@ public class HomeFragment extends Fragment {
                 }
             });
 
+
         } else {
             view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
         }
     }
 
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+
+        Intent chooser = Intent.createChooser(intent, "Choose a Picture");
+        startActivityForResult(chooser, 1);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        AppController.getInstance().getStorageReference().child("articles").child("article2").putFile(data.getData()).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                System.out.println("uploaded");
+//                articleAdapter.notifyDataSetChanged();
+            }
+        });
+
+    }
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

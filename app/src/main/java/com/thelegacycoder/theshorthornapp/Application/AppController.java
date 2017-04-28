@@ -8,6 +8,8 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 /**
  * Created by Aditya on 018, 18 Apr, 2017.
@@ -20,6 +22,7 @@ public class AppController extends Application {
     private static FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase database;
+    private StorageReference mstorageReference;
 
     private static Context context;
 
@@ -34,6 +37,7 @@ public class AppController extends Application {
         context = this;
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
+        mstorageReference = FirebaseStorage.getInstance().getReference();
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -67,6 +71,10 @@ public class AppController extends Application {
         return appController;
     }
 
+
+    public StorageReference getStorageReference() {
+        return mstorageReference;
+    }
 
     public Context getContext() {
         return context;

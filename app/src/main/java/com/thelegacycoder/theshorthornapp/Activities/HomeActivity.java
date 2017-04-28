@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.thelegacycoder.theshorthornapp.Application.AppController;
+import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
@@ -35,6 +36,9 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     private static NavigationView navigationView;
 
+
+    boolean dev = true;
+    LoginController loginController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,10 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
         }
 
-//        LoginController.newInstance(this).login("a@a.com", "asdfasdf", false);
+        if (dev) {
+            loginController = LoginController.newInstance(this);
+            loginController.login("a@a.com", "asdfasdf", false);
+        }
 
 
         changeFragment(HomeFragment.newInstance("Welcome"));
@@ -184,7 +191,9 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             menu.add("Logout").setIcon(android.R.drawable.btn_minus).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    LoginFragment.getLoginController().logout();
+                    if (dev)
+                        loginController.logout();
+                    else LoginFragment.getLoginController().logout();
                     return false;
                 }
             }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
@@ -224,5 +233,6 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
         navigationView.getMenu().findItem(R.id.drawer_item_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.drawer_item_register).setVisible(true);
         invalidateOptionsMenu();
+        changeFragment(HomeFragment.newInstance("Logout"));
     }
 }

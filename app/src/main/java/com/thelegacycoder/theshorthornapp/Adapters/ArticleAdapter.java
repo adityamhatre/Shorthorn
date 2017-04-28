@@ -1,6 +1,8 @@
 package com.thelegacycoder.theshorthornapp.Adapters;
 
 import android.content.Context;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +11,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Models.Article;
 import com.thelegacycoder.theshorthornapp.R;
@@ -103,15 +108,38 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             likeButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onLikeClick((Button) view, articles.get(getAdapterPosition()), getAdapterPosition());
+                    clickHandler.onLikeClick((Button) view, articles.get(getAdapterPosition()), getAdapterPosition(), ((Button) (view)).getText().toString().equalsIgnoreCase("like"));
+                }
+            });
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onItemClick(view, getAdapterPosition());
                 }
             });
 
         }
 
         void bind(int position) {
-            title.setText(articles.get(position).getTitle());
-            author.setText(articles.get(position).getAuthor());
+            Article article = articles.get(position);
+            title.setText(article.getTitle());
+            author.setText(article.getAuthor());
+            if (article.getImageLink() != null) {
+                System.out.println("article" + (articles.size() - position));
+                System.out.println(article.getImageLink());
+                AppController.getInstance().getStorageReference().child("articles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.with(context).load(uri).placeholder(R.drawable.banner).fit().centerInside().into(image);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
+
+            }
 
             if (likesList.contains(articles.size() - position)) {
                 System.out.println("changing to unlike");
@@ -131,6 +159,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
         void onShareClick(View view, Article article, int position);
 
-        void onLikeClick(Button likeButton, Article article, int position);
+        void onLikeClick(Button likeButton, Article article, int position, boolean liked);
+
+        void onItemClick(View view, int position);
     }
 }
