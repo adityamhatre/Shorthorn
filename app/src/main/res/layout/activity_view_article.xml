@@ -32,7 +32,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/article_title"
         android:layout_margin="@dimen/activity_horizontal_margin"
-        android:text="Placeholder\n1\n2\n3\n1\n2\n3\n1\n2\n3\n1\n2\n3"
         android:textColor="@android:color/black"
         android:textSize="20sp" />
 </RelativeLayout>

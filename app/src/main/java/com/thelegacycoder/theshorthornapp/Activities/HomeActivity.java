@@ -50,9 +50,7 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
         setListeners();
 
 
-        System.out.println("here");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            System.out.println("in if");
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 12321);
         }
 

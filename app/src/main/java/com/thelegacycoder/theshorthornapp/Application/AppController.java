@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.thelegacycoder.theshorthornapp.Models.User;
 
 /**
  * Created by Aditya on 018, 18 Apr, 2017.
@@ -25,6 +26,7 @@ public class AppController extends Application {
     private StorageReference mstorageReference;
 
     private static Context context;
+    private User user;
 
     public FirebaseDatabase getDatabase() {
         return database;
@@ -89,4 +91,11 @@ public class AppController extends Application {
 
     }
 
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
 }

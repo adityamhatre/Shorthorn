@@ -8,9 +8,13 @@ import android.util.Log;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.thelegacycoder.theshorthornapp.Activities.HomeActivity;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
+import com.thelegacycoder.theshorthornapp.Models.User;
 
 import static com.google.android.gms.internal.zzs.TAG;
 
@@ -32,9 +36,20 @@ public class LoginController {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                         if (task.isSuccessful()) {
-                            LoginFragment.loginCallback(true);
-                            AppController.getInstance().setLoggedIn(true);
-                            ((HomeActivity) context).loginCallback(true);
+                            AppController.getInstance().getDatabase().getReference().child("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("type").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    AppController.getInstance().setUser(new User(dataSnapshot.getValue().toString().toLowerCase()));
+                                    LoginFragment.loginCallback(true);
+                                    AppController.getInstance().setLoggedIn(true);
+                                    ((HomeActivity) context).loginCallback(true);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    System.out.println(databaseError.getMessage());
+                                }
+                            });
                         }
 
                         if (!task.isSuccessful()) {
@@ -51,10 +66,23 @@ public class LoginController {
                     .addOnCompleteListener((Activity) context, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
+
                             Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                             if (task.isSuccessful()) {
-                                AppController.getInstance().setLoggedIn(true);
-                                ((HomeActivity) context).loginCallback(true);
+                                AppController.getInstance().getDatabase().getReference().child("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("type").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        AppController.getInstance().setUser(new User(dataSnapshot.getValue().toString().toLowerCase()));
+                                        AppController.getInstance().setLoggedIn(true);
+                                        ((HomeActivity) context).loginCallback(true);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        System.out.println(databaseError.getMessage());
+                                    }
+                                });
+
                             }
 
                             if (!task.isSuccessful()) {

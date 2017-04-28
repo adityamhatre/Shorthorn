@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -36,7 +37,6 @@ import com.thelegacycoder.theshorthornapp.R;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
@@ -47,7 +47,8 @@ public class HomeFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ArticleAdapter articleAdapter;
-    private RecyclerView recyclerView;
+    private RecyclerView articleRecyclerView;
+    private ArrayList<Article> articles, tempArticles;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -100,15 +101,165 @@ public class HomeFragment extends Fragment {
 
         if (AppController.getInstance().isLoggedIn()) {
             Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
-            recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-            recyclerView.setHasFixedSize(true);
+            articleRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+            articleRecyclerView.setHasFixedSize(true);
             LinearLayoutManager llm = new LinearLayoutManager(getActivity());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
-            recyclerView.setLayoutManager(llm);
-            final ArrayList<Article> articles = new ArrayList<>();
+            articleRecyclerView.setLayoutManager(llm);
+            articles = new ArrayList<>();
+            tempArticles = new ArrayList<>();
+
+            articleAdapter = new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+                @Override
+                public void onReportClick(Article article, int position) {
+                    position = articles.size() - position;
+                    final int finalPosition = position;
+                    AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + position).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            int reportCount;
+                            if (dataSnapshot.getValue() != null) {
+                                reportCount = dataSnapshot.getValue(Integer.class);
+                            } else reportCount = 0;
+                            reportCount++;
+                            AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + finalPosition).setValue(reportCount).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(getActivity(), "Reported article", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
 
 
-            AppController.getInstance().getDatabase().getReference("articles").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+                @Override
+                public void onShareClick(View view, Article article, int position) {
+                    view.findViewById(R.id.share_button).setVisibility(View.GONE);
+                    view.findViewById(R.id.like_button).setVisibility(View.GONE);
+                    view.findViewById(R.id.report_button).setVisibility(View.GONE);
+
+                    Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(returnedBitmap);
+                    Drawable bgDrawable = view.getBackground();
+                    if (bgDrawable != null)
+                        bgDrawable.draw(canvas);
+                    else
+                        canvas.drawColor(Color.WHITE);
+                    view.draw(canvas);
+
+                    ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    returnedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                    String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), returnedBitmap, null, null);
+                    Uri uri = Uri.parse(path);
+
+                    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                    shareIntent.setAction(Intent.ACTION_SEND);
+                    shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                    shareIntent.setType("text/plain");
+                    shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                    shareIntent.setType("image*//*");
+                    getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
+                    view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.like_button).setVisibility(View.VISIBLE);
+                    view.findViewById(R.id.report_button).setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onLikeClick(Button likeButton, Article article, int position, boolean liked) {
+                    position = articles.size() - position;
+                    if (liked) {
+                        AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(true);
+                    } else {
+                        AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(null);
+                        if (articleAdapter != null) {
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onItemClick(View view, Article article, int position) {
+                    startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article));
+                }
+            });
+
+            articleRecyclerView.setAdapter(articleAdapter);
+
+            AppController.getInstance().getDatabase().getReference("articles").orderByChild("identifier").addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    System.out.println("\n----child added---------\n" + dataSnapshot.toString());
+                    System.out.println("\n----child added key---------" + dataSnapshot.getKey());
+                    if (dataSnapshot.hasChild("author") && dataSnapshot.hasChild("title") && dataSnapshot.hasChild("description") && dataSnapshot.hasChild("imageLink")) {
+
+                        //:TODO inefficient operation here...need to think how to optimize this..
+                        //:TODO maybe use a new data structure
+
+                        tempArticles.addAll(articles);
+
+                        articles.clear();
+                        articles.add(dataSnapshot.getValue(Article.class));
+                        articles.get(articles.size() - 1).setID(dataSnapshot.getKey());
+                        articles.addAll(tempArticles);
+                        tempArticles.clear();
+                        articleAdapter.notifyDataSetChanged();
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    System.out.println("\n----child changed---------\n" + dataSnapshot.toString());
+                    System.out.println("\n----child changed key---------\n" + dataSnapshot.getKey());
+                    Article changedArticle = dataSnapshot.getValue(Article.class);
+                    changedArticle.setID(dataSnapshot.getKey());
+
+                    int replaceIndex = 0;
+                    for (Article iterationArticle : articles) {
+                        if (iterationArticle.getID().equalsIgnoreCase(changedArticle.getID())) {
+                            iterationArticle.setID(changedArticle.getID());
+                            articles.set(replaceIndex, changedArticle);
+                            break;
+                        }
+                        replaceIndex++;
+                    }
+                    articleAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    System.out.println("\n----child removed---------\n" + dataSnapshot.toString());
+                    System.out.println("\n----child removed key---------\n" + dataSnapshot.getKey());
+                    for (Article iterationArticle : articles) {
+                        if (iterationArticle.getID().equalsIgnoreCase(dataSnapshot.getKey())) {
+                            articles.remove(iterationArticle);
+                            break;
+                        }
+                    }
+                    articleAdapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                    System.out.println("\n----child moved---------\n" + dataSnapshot.toString());
+                    System.out.println("\n----child moved---------\n" + dataSnapshot.getKey());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+                    /*addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -175,7 +326,7 @@ public class HomeFragment extends Fragment {
 
                             shareIntent.setType("text/plain");
                             shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                            shareIntent.setType("image/*");
+                            shareIntent.setType("image*//*");
                             getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
                             view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
                             view.findViewById(R.id.like_button).setVisibility(View.VISIBLE);
@@ -201,14 +352,14 @@ public class HomeFragment extends Fragment {
                             startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article));
                         }
                     });
-                    recyclerView.setAdapter(articleAdapter);
+                    articleRecyclerView.setAdapter(articleAdapter);
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
 
                 }
-            });
+            });*/
 
 
         } else {
