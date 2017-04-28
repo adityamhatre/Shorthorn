@@ -93,6 +93,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             likeButton = (Button) itemView.findViewById(R.id.like_button);
             shareButton = (Button) itemView.findViewById(R.id.share_button);
 
+
             reportButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -114,7 +115,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    clickHandler.onItemClick(view, getAdapterPosition());
+                    clickHandler.onItemClick(view, articles.get(getAdapterPosition()), getAdapterPosition());
                 }
             });
 
@@ -161,6 +162,6 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
         void onLikeClick(Button likeButton, Article article, int position, boolean liked);
 
-        void onItemClick(View view, int position);
+        void onItemClick(View view, Article article, int position);
     }
 }

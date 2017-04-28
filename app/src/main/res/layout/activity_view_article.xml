@@ -5,4 +5,34 @@
     android:layout_height="match_parent"
     tools:context="com.thelegacycoder.theshorthornapp.Activities.ViewArticleActivity">
 
+    <ImageView
+        android:id="@+id/article_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:background="@android:color/darker_gray"
+        android:scaleType="centerCrop"
+        android:src="@drawable/banner" />
+
+    <TextView
+        android:id="@+id/article_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/article_image"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:text="Placeholder\n1\n2\n3"
+        android:textColor="@android:color/black"
+        android:textSize="30sp" />
+
+
+    <WebView
+        android:id="@+id/article_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/article_title"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:text="Placeholder\n1\n2\n3\n1\n2\n3\n1\n2\n3\n1\n2\n3"
+        android:textColor="@android:color/black"
+        android:textSize="20sp" />
 </RelativeLayout>

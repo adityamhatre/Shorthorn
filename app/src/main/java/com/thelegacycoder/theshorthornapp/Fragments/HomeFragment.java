@@ -197,8 +197,8 @@ public class HomeFragment extends Fragment {
                         }
 
                         @Override
-                        public void onItemClick(View view, int position) {
-                            startActivity(new Intent(getActivity(), ViewArticleActivity.class));
+                        public void onItemClick(View view, Article article, int position) {
+                            startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article));
                         }
                     });
                     recyclerView.setAdapter(articleAdapter);

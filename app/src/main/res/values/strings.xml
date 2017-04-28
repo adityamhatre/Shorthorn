@@ -15,6 +15,7 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="CLOSE_DRAWER">Close Drawer</string>
     <string name="OPEN_DRAWER">Open Drawer</string>
+    <string name="transition_name">imageTransition</string>
 
     <string-array name="login_types">
         <item>Reader</item>
