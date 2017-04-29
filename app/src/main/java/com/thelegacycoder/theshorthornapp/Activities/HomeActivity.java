@@ -1,6 +1,7 @@
 package com.thelegacycoder.theshorthornapp.Activities;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -178,6 +180,8 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     }
 
+    AlertDialog alertDialog;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (currentFragment != HomeFragment.class) {
@@ -189,18 +193,28 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             menu.add("Logout").setIcon(android.R.drawable.btn_minus).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
-                    if (dev)
-                        loginController.logout();
-                    else LoginFragment.getLoginController().logout();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this).setTitle("Confirm").setMessage("Are you sure to logout ?").setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (dev)
+                                loginController.logout();
+                            else LoginFragment.getLoginController().logout();
+                        }
+                    }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (alertDialog.isShowing()) alertDialog.cancel();
+                        }
+                    });
+
+                    alertDialog = builder.create();
+                    alertDialog.show();
+
                     return false;
                 }
             }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-            menu.add("Filter").setIcon(android.R.drawable.ic_menu_preferences).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem menuItem) {
-                    return false;
-                }
-            }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
         }
         return super.onCreateOptionsMenu(menu);
     }

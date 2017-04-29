@@ -8,27 +8,29 @@ import android.os.Parcelable;
  */
 
 public class Article implements Parcelable {
-    String id, title, description, author, imageLink;
+    String id, title, description, author, imageLink, category;
 
-    public Article(String id, String title, String description, String author, String imageLink) {
+    public Article(String id, String title, String description, String author, String imageLink, String category) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.author = author;
         this.imageLink = imageLink;
+        this.category = category;
     }
 
     public Article() {
     }
 
     public Article(Parcel parcel) {
-        String data[] = new String[5];
+        String data[] = new String[6];
         parcel.readStringArray(data);
         this.title = data[0];
         this.description = data[1];
         this.author = data[2];
         this.imageLink = data[3];
         this.id = data[4];
+        this.category = data[5];
     }
 
 
@@ -49,6 +51,10 @@ public class Article implements Parcelable {
     }
 
 
+    public String getCategory() {
+        return category;
+    }
+
     public String getID() {
         return id;
     }
@@ -64,7 +70,7 @@ public class Article implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeStringArray(new String[]{title, description, author, imageLink});
+        parcel.writeStringArray(new String[]{getTitle(), getDescription(), getAuthor(), getImageLink(), getID(), getCategory()});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

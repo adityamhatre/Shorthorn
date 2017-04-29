@@ -53,7 +53,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                throw databaseError.toException();
             }
         });
 

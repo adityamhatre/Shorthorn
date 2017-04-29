@@ -1,6 +1,7 @@
 package com.thelegacycoder.theshorthornapp.Fragments;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -12,13 +13,21 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,6 +51,9 @@ public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private View filterView;
+    private AlertDialog filterDialog;
+
     private String mParam1;
     private String mParam2;
 
@@ -49,6 +61,7 @@ public class HomeFragment extends Fragment {
     private ArticleAdapter articleAdapter;
     private RecyclerView articleRecyclerView;
     private ArrayList<Article> articles, tempArticles;
+    private ArrayList<String> categories, selectedCategories;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -88,6 +101,7 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         LinearLayout wrapper = new LinearLayout(getActivity()); // for example
         inflater.inflate(R.layout.fragment_home, wrapper, true);
+        setHasOptionsMenu(true);
         return wrapper;
         //return inflater.inflate(R.layout.fragment_home, container, false);
     }
@@ -106,8 +120,12 @@ public class HomeFragment extends Fragment {
             LinearLayoutManager llm = new LinearLayoutManager(getActivity());
             llm.setOrientation(LinearLayoutManager.VERTICAL);
             articleRecyclerView.setLayoutManager(llm);
+
             articles = new ArrayList<>();
             tempArticles = new ArrayList<>();
+            categories = new ArrayList<>();
+            selectedCategories = new ArrayList<>();
+
 
             articleAdapter = new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
                 @Override
@@ -168,6 +186,7 @@ public class HomeFragment extends Fragment {
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                     shareIntent.setType("image*//*");
                     getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
+
                     view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.like_button).setVisibility(View.VISIBLE);
                     view.findViewById(R.id.report_button).setVisibility(View.VISIBLE);
@@ -206,7 +225,6 @@ public class HomeFragment extends Fragment {
                         //:TODO maybe use a new data structure
 
                         tempArticles.addAll(articles);
-
                         articles.clear();
                         articles.add(dataSnapshot.getValue(Article.class));
                         articles.get(articles.size() - 1).setID(dataSnapshot.getKey());
@@ -256,116 +274,53 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                    throw databaseError.toException();
                 }
             });
-                    /*addValueEventListener(new ValueEventListener() {
+
+            AppController.getInstance().getDatabase().getReference("categories").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    articles.clear();
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        articles.add(postSnapshot.getValue(Article.class));
+                    categories.clear();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        categories.add(snapshot.getValue(String.class));
                     }
+                    filterView = getActivity().getLayoutInflater().inflate(R.layout.filter_dialog, null);
+                    ListView categoryListView = (ListView) filterView.findViewById(R.id.category_list);
+                    categoryListView.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories));
+                    categoryListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
-                    Collections.reverse(articles);
-                    articleAdapter = new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+                    filterDialog = new AlertDialog.Builder(getContext()).setView(filterView).setNegativeButton("Cancel", null).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
-                        public void onReportClick(Article article, int position) {
-                            position = articles.size() - position;
-                            final int finalPosition = position;
-                            AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + position).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    int reportCount;
-                                    if (dataSnapshot.getValue() != null) {
-                                        reportCount = dataSnapshot.getValue(Integer.class);
-                                    } else reportCount = 0;
-                                    reportCount++;
-                                    AppController.getInstance().getDatabase().getReference("reportedArticles").child("article" + finalPosition).setValue(reportCount).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                Toast.makeText(getActivity(), "Reported article", Toast.LENGTH_SHORT).show();
-                                            }
-                                        }
-                                    });
+                        public void onClick(DialogInterface dialogInterface, int ii) {
+                            ListView categoryListView = (ListView) filterView.findViewById(R.id.category_list);
+                            selectedCategories.clear();
+                            int len = categoryListView.getCount();
+                            SparseBooleanArray checked = categoryListView.getCheckedItemPositions();
+                            for (int i = 0; i < len; i++)
+                                if (checked.get(i)) {
+                                    String item = categories.get(i);
+  /* do whatever you want with the checked item */
+                                    selectedCategories.add(item);
                                 }
-
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
+                            System.out.println(selectedCategories.toString());
+                            filterDialog.cancel();
                         }
-
-                        @Override
-                        public void onShareClick(View view, Article article, int position) {
-                            view.findViewById(R.id.share_button).setVisibility(View.GONE);
-                            view.findViewById(R.id.like_button).setVisibility(View.GONE);
-                            view.findViewById(R.id.report_button).setVisibility(View.GONE);
-
-                            Bitmap returnedBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
-                            Canvas canvas = new Canvas(returnedBitmap);
-                            Drawable bgDrawable = view.getBackground();
-                            if (bgDrawable != null)
-                                bgDrawable.draw(canvas);
-                            else
-                                canvas.drawColor(Color.WHITE);
-                            view.draw(canvas);
-
-                            ByteArrayOutputStream os = new ByteArrayOutputStream();
-                            returnedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
-                            String path = MediaStore.Images.Media.insertImage(getContext().getContentResolver(), returnedBitmap, null, null);
-                            Uri uri = Uri.parse(path);
-
-                            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                            shareIntent.setAction(Intent.ACTION_SEND);
-                            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                            shareIntent.setType("text/plain");
-                            shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                            shareIntent.setType("image*//*");
-                            getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
-                            view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.like_button).setVisibility(View.VISIBLE);
-                            view.findViewById(R.id.report_button).setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onLikeClick(Button likeButton, Article article, int position, boolean liked) {
-                            position = articles.size() - position;
-                            if (liked) {
-                                AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(true);
-                            } else {
-                                AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").child("article" + position).setValue(null);
-                                if (articleAdapter != null) {
-                                    articleAdapter.notifyDataSetChanged();
-                                }
-
-                            }
-                        }
-
-                        @Override
-                        public void onItemClick(View view, Article article, int position) {
-                            startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article));
-                        }
-                    });
-                    articleRecyclerView.setAdapter(articleAdapter);
+                    }).create();
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                    throw databaseError.toException();
                 }
-            });*/
+            });
 
 
         } else {
             view.setBackgroundColor(getActivity().getResources().getColor(R.color.colorAccent));
         }
     }
+
 
     private void showFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -381,11 +336,26 @@ public class HomeFragment extends Fragment {
             @Override
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                 System.out.println("uploaded");
-//                articleAdapter.notifyDataSetChanged();
             }
         });
 
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        if (AppController.getInstance().isLoggedIn()) {
+            menu.add("Filter").setIcon(android.R.drawable.ic_menu_preferences).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    filterDialog.show();
+                    return false;
+                }
+            }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        }
+    }
+
 
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

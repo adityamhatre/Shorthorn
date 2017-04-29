@@ -47,7 +47,7 @@ public class LoginController {
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
-                                    System.out.println(databaseError.getMessage());
+                                    throw databaseError.toException();
                                 }
                             });
                         }
@@ -79,7 +79,7 @@ public class LoginController {
 
                                     @Override
                                     public void onCancelled(DatabaseError databaseError) {
-                                        System.out.println(databaseError.getMessage());
+                                        throw databaseError.toException();
                                     }
                                 });
 
