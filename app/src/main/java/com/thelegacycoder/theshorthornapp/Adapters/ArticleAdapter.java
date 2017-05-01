@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                throw databaseError.toException();
+                Log.d("DB ERROR", databaseError.toString());
             }
         });
 
@@ -131,12 +132,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
                 AppController.getInstance().getStorageReference().child("articles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        Picasso.with(context).load(uri).placeholder(R.drawable.banner).fit().centerInside().into(image);
+                        Picasso.with(context).load(uri).placeholder(R.drawable.loading).fit().centerInside().into(image);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        image.setImageResource(R.drawable.banner);
+                        image.setImageResource(R.drawable.loading);
                     }
                 });
 
@@ -145,9 +146,9 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             if (likesList.contains(articles.size() - position)) {
                 System.out.println("changing to unlike");
                 likeButton.setText("Unlike");
-                likeButton.setTextColor(context.getResources().getColor(R.color.colorAccent));
+                likeButton.setTextColor(context.getResources().getColor(R.color.colorPrimary));
             } else {
-                likeButton.setTextColor(context.getResources().getColor(android.R.color.white));
+                likeButton.setTextColor(context.getResources().getColor(android.R.color.black));
                 System.out.println("changing to like");
                 likeButton.setText("Like");
             }

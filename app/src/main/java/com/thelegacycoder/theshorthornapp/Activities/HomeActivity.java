@@ -214,7 +214,9 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
                     return false;
                 }
             }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
+            if (AppController.getInstance().getUser().getType().equalsIgnoreCase("writer")) {
+                menu.add("Add new article").setIcon(android.R.drawable.ic_menu_add).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+            }
         }
         return super.onCreateOptionsMenu(menu);
     }

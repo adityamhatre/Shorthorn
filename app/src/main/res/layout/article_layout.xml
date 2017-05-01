@@ -1,80 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
-    android:layout_margin="5dp"
-    android:orientation="vertical">
+    android:layout_height="410dp"
+    android:layout_margin="14dp"
+    android:orientation="vertical"
+    app:cardElevation="10dp">
 
-    <ImageView
-        android:id="@+id/image"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/title"
-        android:layout_alignParentTop="true"
-        android:adjustViewBounds="true"
-        android:background="@android:color/darker_gray"
-        android:scaleType="centerCrop"
-        android:src="@drawable/banner" />
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/author"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/image"
-        android:layout_alignParentEnd="true"
-        android:padding="@dimen/activity_horizontal_margin"
-        android:text="Author"
-        android:background="#aaffffff"
-        android:textAlignment="viewEnd"
-        android:textColor="@android:color/black"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/bottom_bar"
-        android:background="#f58025"
-        android:padding="10dp"
-        android:text="Title"
-        android:textColor="@android:color/black"
-        android:textSize="25sp" />
-
-
-    <LinearLayout
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:background="@color/colorAccent"
-        android:orientation="horizontal"
-        android:weightSum="3">
-
-        <Button
-            android:id="@+id/report_button"
+        <ImageView
+            android:id="@+id/image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="Report"
-            android:textColor="#ffffff" />
+            android:layout_above="@+id/title"
+            android:layout_alignParentTop="true"
+            android:adjustViewBounds="true"
+            android:background="@android:color/darker_gray"
+            android:scaleType="centerCrop"
+            android:src="@drawable/loading" />
 
-        <Button
-            android:id="@+id/share_button"
+
+        <TextView
+            android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="Share"
-            android:textColor="#ffffff" />
+            android:layout_above="@+id/author"
+            android:layout_marginLeft="10dp"
+            android:text="Title"
+            android:textColor="@android:color/black"
+            android:textSize="25sp" />
 
-        <Button
-            android:id="@+id/like_button"
+        <TextView
+            android:id="@+id/author"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:backgroundTint="@color/colorPrimary"
-            android:text="Like"
-            android:textColor="#ffffff" />
-    </LinearLayout>
-</RelativeLayout>
+            android:layout_above="@+id/separator"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="10dp"
+            android:text="Author"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/separator"
+            android:layout_width="match_parent"
+            android:layout_height="3px"
+            android:layout_above="@+id/bottom_bar"
+            android:layout_marginTop="10dp"
+            android:background="#cccccc" />
+
+        <LinearLayout
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/report_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Report"
+                android:textColor="#000000" />
+
+            <View
+                android:layout_width="2px"
+                android:layout_height="match_parent"
+                android:background="#cccccc" />
+
+            <Button
+                android:id="@+id/share_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Share"
+                android:textColor="#000000" />
+
+            <View
+                android:layout_width="2px"
+                android:layout_height="match_parent"
+                android:background="#cccccc" />
+
+            <Button
+                android:id="@+id/like_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="Like"
+                android:textColor="#000000" />
+        </LinearLayout>
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

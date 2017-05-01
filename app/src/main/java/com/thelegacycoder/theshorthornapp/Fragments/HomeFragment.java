@@ -16,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -60,8 +61,9 @@ public class HomeFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private ArticleAdapter articleAdapter;
     private RecyclerView articleRecyclerView;
-    private ArrayList<Article> articles, tempArticles;
+    private ArrayList<Article> articles, tempArticles, filteredArticles;
     private ArrayList<String> categories, selectedCategories;
+    private ArticleAdapter.ClickHandler itemsClickHandler;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -123,11 +125,11 @@ public class HomeFragment extends Fragment {
 
             articles = new ArrayList<>();
             tempArticles = new ArrayList<>();
+            filteredArticles = new ArrayList<>();
             categories = new ArrayList<>();
             selectedCategories = new ArrayList<>();
 
-
-            articleAdapter = new ArticleAdapter(getActivity(), articles, new ArticleAdapter.ClickHandler() {
+            itemsClickHandler = new ArticleAdapter.ClickHandler() {
                 @Override
                 public void onReportClick(Article article, int position) {
                     position = articles.size() - position;
@@ -184,7 +186,7 @@ public class HomeFragment extends Fragment {
 
                     shareIntent.setType("text/plain");
                     shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                    shareIntent.setType("image*//*");
+                    shareIntent.setType("image/*");
                     getContext().startActivity(Intent.createChooser(shareIntent, "Share via"));
 
                     view.findViewById(R.id.share_button).setVisibility(View.VISIBLE);
@@ -210,7 +212,8 @@ public class HomeFragment extends Fragment {
                 public void onItemClick(View view, Article article, int position) {
                     startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article));
                 }
-            });
+            };
+            articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler);
 
             articleRecyclerView.setAdapter(articleAdapter);
 
@@ -274,7 +277,7 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    throw databaseError.toException();
+                    Log.d("DB ERROR", databaseError.toException().toString());
                 }
             });
 
@@ -286,11 +289,22 @@ public class HomeFragment extends Fragment {
                         categories.add(snapshot.getValue(String.class));
                     }
                     filterView = getActivity().getLayoutInflater().inflate(R.layout.filter_dialog, null);
-                    ListView categoryListView = (ListView) filterView.findViewById(R.id.category_list);
+                    final ListView categoryListView = (ListView) filterView.findViewById(R.id.category_list);
                     categoryListView.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_multiple_choice, categories));
                     categoryListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
 
-                    filterDialog = new AlertDialog.Builder(getContext()).setView(filterView).setNegativeButton("Cancel", null).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    filterDialog = new AlertDialog.Builder(getContext()).setView(filterView).setNegativeButton("Clear Filters", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                            for (int j = 0; j < categoryListView.getCount(); j++) {
+                                categoryListView.setItemChecked(j, false);
+                            }
+
+                            articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler);
+                            articleRecyclerView.setAdapter(articleAdapter);
+                        }
+                    }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int ii) {
                             ListView categoryListView = (ListView) filterView.findViewById(R.id.category_list);
@@ -305,13 +319,29 @@ public class HomeFragment extends Fragment {
                                 }
                             System.out.println(selectedCategories.toString());
                             filterDialog.cancel();
+                            if (selectedCategories.size() > 0) {
+                                filteredArticles.clear();
+                                for (int i = 0; i < articles.size(); i++) {
+                                    System.out.println(articles.get(i).getCategory());
+                                    if (selectedCategories.contains(articles.get(i).getCategory())) {
+                                        filteredArticles.add(articles.get(i));
+                                    }
+                                }
+
+                                articleAdapter = new ArticleAdapter(getActivity(), filteredArticles, itemsClickHandler);
+                                articleRecyclerView.setAdapter(articleAdapter);
+                            } else {
+                                articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler);
+                                articleRecyclerView.setAdapter(articleAdapter);
+                            }
+
                         }
                     }).create();
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    throw databaseError.toException();
+                    Log.d("DB ERROR", databaseError.toException().toString());
                 }
             });
 
