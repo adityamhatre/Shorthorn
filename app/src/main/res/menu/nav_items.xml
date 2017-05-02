@@ -16,6 +16,11 @@
             android:id="@+id/drawer_item_register"
             android:icon="@mipmap/ic_launcher"
             android:title="Register" />
+        <item
+            android:id="@+id/drawer_add_article"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Add Article"
+            android:visible="false" />
     </group>
 
     <group

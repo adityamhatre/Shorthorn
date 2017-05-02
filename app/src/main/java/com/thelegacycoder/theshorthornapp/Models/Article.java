@@ -8,10 +8,11 @@ import android.os.Parcelable;
  */
 
 public class Article implements Parcelable {
-    String id, title, description, author, imageLink, category;
+    String title, description, author, imageLink, category;
+    int identifier;
 
-    public Article(String id, String title, String description, String author, String imageLink, String category) {
-        this.id = id;
+    public Article(int identifier, String title, String description, String author, String imageLink, String category) {
+        this.identifier = identifier;
         this.title = title;
         this.description = description;
         this.author = author;
@@ -29,7 +30,7 @@ public class Article implements Parcelable {
         this.description = data[1];
         this.author = data[2];
         this.imageLink = data[3];
-        this.id = data[4];
+        this.identifier = Integer.parseInt(data[4]);
         this.category = data[5];
     }
 
@@ -55,12 +56,12 @@ public class Article implements Parcelable {
         return category;
     }
 
-    public String getID() {
-        return id;
+    public int getIdentifier() {
+        return identifier;
     }
 
-    public void setID(String id) {
-        this.id = id;
+    public void setIdentifier(int identifier) {
+        this.identifier = identifier;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class Article implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeStringArray(new String[]{getTitle(), getDescription(), getAuthor(), getImageLink(), getID(), getCategory()});
+        parcel.writeStringArray(new String[]{getTitle(), getDescription(), getAuthor(), getImageLink(), ""+getIdentifier(), getCategory()});
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -89,7 +90,7 @@ public class Article implements Parcelable {
         if (obj != null) {
             if (obj instanceof Article) {
                 Article article = (Article) obj;
-                return (article.getID().equals(id));
+                return (article.getIdentifier() ==  (identifier));
             }
         }
 

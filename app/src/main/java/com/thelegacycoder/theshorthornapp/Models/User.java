@@ -5,17 +5,36 @@ package com.thelegacycoder.theshorthornapp.Models;
  */
 
 public class User {
-    String type;
+    String user, name, type;
 
-    public void setType(String type) {
+    public User(){}
+    public User(String type, String name, String user) {
+        this.user = user;
+        this.name = name;
         this.type = type;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {
         return type;
     }
 
-    public User(String type) {
+    public void setType(String type) {
         this.type = type;
     }
 }

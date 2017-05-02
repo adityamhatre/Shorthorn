@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/viewA"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+
+        <ImageView
+            android:id="@+id/articleImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            app:srcCompat="@drawable/loading" />
+
+        <EditText
+            android:id="@+id/articleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/articleImage"
+            android:hint="Article Title "
+            android:textAlignment="viewStart"
+            android:textSize="24sp" />
+
+        <Space
+            android:id="@+id/space"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/articleTitle" />
+
+        <EditText
+            android:id="@+id/articleBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/space"
+            android:hint="Article Body" />
+
+        <Button
+            android:id="@+id/Publish"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/category_list"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="22dp"
+            android:text="Publish" />
+
+        <Spinner
+            android:id="@+id/category_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/articleBody"
+            android:backgroundTint="@color/colorAccent"
+            android:drawSelectorOnTop="true"
+            android:spinnerMode="dropdown" />
+
+
+    </RelativeLayout>
+</ScrollView>

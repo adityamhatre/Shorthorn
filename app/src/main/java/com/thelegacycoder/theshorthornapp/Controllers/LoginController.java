@@ -36,10 +36,10 @@ public class LoginController {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                         if (task.isSuccessful()) {
-                            AppController.getInstance().getDatabase().getReference().child("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("type").addListenerForSingleValueEvent(new ValueEventListener() {
+                            AppController.getInstance().getDatabase().getReference().child("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    AppController.getInstance().setUser(new User(dataSnapshot.getValue().toString().toLowerCase()));
+                                    AppController.getInstance().setUser(dataSnapshot.getValue(User.class));
                                     LoginFragment.loginCallback(true);
                                     AppController.getInstance().setLoggedIn(true);
                                     ((HomeActivity) context).loginCallback(true);
@@ -69,10 +69,10 @@ public class LoginController {
 
                             Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                             if (task.isSuccessful()) {
-                                AppController.getInstance().getDatabase().getReference().child("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("type").addListenerForSingleValueEvent(new ValueEventListener() {
+                                AppController.getInstance().getDatabase().getReference().child("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
-                                        AppController.getInstance().setUser(new User(dataSnapshot.getValue().toString().toLowerCase()));
+                                        AppController.getInstance().setUser((dataSnapshot.getValue(User.class)));
                                         AppController.getInstance().setLoggedIn(true);
                                         ((HomeActivity) context).loginCallback(true);
                                     }

@@ -95,6 +95,8 @@ public class AppController extends Application {
         this.user = user;
     }
 
+
+
     public User getUser() {
         return user;
     }

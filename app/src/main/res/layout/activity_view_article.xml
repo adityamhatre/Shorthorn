@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.thelegacycoder.theshorthornapp.Activities.ViewArticleActivity">
@@ -13,7 +18,7 @@
         android:adjustViewBounds="true"
         android:background="@android:color/darker_gray"
         android:scaleType="centerCrop"
-        android:src="@drawable/banner" />
+        android:src="@drawable/loading" />
 
     <TextView
         android:id="@+id/article_title"
@@ -35,3 +40,4 @@
         android:textColor="@android:color/black"
         android:textSize="20sp" />
 </RelativeLayout>
+</ScrollView>

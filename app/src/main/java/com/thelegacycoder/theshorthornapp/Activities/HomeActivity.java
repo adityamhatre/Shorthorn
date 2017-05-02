@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
+import com.thelegacycoder.theshorthornapp.Fragments.AddArticleFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.HomeFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
@@ -215,7 +216,14 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
                 }
             }).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
             if (AppController.getInstance().getUser().getType().equalsIgnoreCase("writer")) {
-                menu.add("Add new article").setIcon(android.R.drawable.ic_menu_add).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                menu.add("Add new article").setIcon(android.R.drawable.ic_menu_add)
+                        .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                changeFragment(AddArticleFragment.newInstance("", ""));
+                                return false;
+                            }
+                        });
             }
         }
         return super.onCreateOptionsMenu(menu);
@@ -238,6 +246,12 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     }
 
+    @Override
+    public void onBackPressed() {
+        if(currentFragment == AddArticleFragment.class){
+            changeFragment(HomeFragment.newInstance(""));
+        }
+    }
 
     public static NavigationView getNavigationView() {
         return navigationView;

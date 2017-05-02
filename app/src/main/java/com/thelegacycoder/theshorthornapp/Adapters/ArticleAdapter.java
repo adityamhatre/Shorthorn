@@ -137,6 +137,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        System.out.println(e.getMessage());
                         image.setImageResource(R.drawable.loading);
                     }
                 });

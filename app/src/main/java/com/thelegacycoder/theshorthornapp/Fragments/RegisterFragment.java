@@ -39,10 +39,10 @@ public class RegisterFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private String email = "", password = "", confirmPassword = "", loginType = "";
+    private String email = "", name = "", password = "", confirmPassword = "", loginType = "";
 
     private static Button registerButton;
-    private static EditText emailInput, passwordInput, confirmPasswordInput;
+    private static EditText emailInput, passwordInput, confirmPasswordInput, nameInput;
     private Spinner loginTypes;
     private RegisterController registerController;
 
@@ -99,11 +99,13 @@ public class RegisterFragment extends Fragment {
                 email = emailInput.getText().toString().trim();
                 password = passwordInput.getText().toString().trim();
                 confirmPassword = confirmPasswordInput.getText().toString().trim();
+                name = nameInput.getText().toString().trim();
+
                 loginType = loginTypes.getSelectedItem().toString();
                 if (password.equalsIgnoreCase(confirmPassword))
                     if (password.length() >= 8) {
                         displayLoading();
-                        registerController.register(email, password, loginType);
+                        registerController.register(email, password, loginType, name);
                     } else showShortLengthError();
                 else showPasswordNotMatchingError();
 
@@ -143,6 +145,7 @@ public class RegisterFragment extends Fragment {
         emailInput = (EditText) view.findViewById(R.id.input_email);
         passwordInput = (EditText) view.findViewById(R.id.input_password);
         confirmPasswordInput = (EditText) view.findViewById(R.id.input_confirm_password);
+        nameInput = (EditText) view.findViewById(R.id.input_name);
 
         shader = view.findViewById(R.id.shader);
 

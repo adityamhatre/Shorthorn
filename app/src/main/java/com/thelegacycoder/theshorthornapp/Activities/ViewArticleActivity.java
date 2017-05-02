@@ -32,7 +32,7 @@ public class ViewArticleActivity extends AppCompatActivity {
             AppController.getInstance().getStorageReference().child("articles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    Picasso.with(ViewArticleActivity.this).load(uri).placeholder(R.drawable.banner).fit().into((ImageView) findViewById(R.id.article_image));
+                    Picasso.with(ViewArticleActivity.this).load(uri).placeholder(R.drawable.loading).fit().centerInside().into((ImageView) findViewById(R.id.article_image));
                 }
             });
         }

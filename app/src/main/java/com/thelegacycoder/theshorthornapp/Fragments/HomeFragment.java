@@ -57,6 +57,7 @@ public class HomeFragment extends Fragment {
 
     private String mParam1;
     private String mParam2;
+    public static int articleSize;
 
     private OnFragmentInteractionListener mListener;
     private ArticleAdapter articleAdapter;
@@ -116,7 +117,7 @@ public class HomeFragment extends Fragment {
         //showFileChooser();
 
         if (AppController.getInstance().isLoggedIn()) {
-            Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
             articleRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
             articleRecyclerView.setHasFixedSize(true);
             LinearLayoutManager llm = new LinearLayoutManager(getActivity());
@@ -230,8 +231,9 @@ public class HomeFragment extends Fragment {
                         tempArticles.addAll(articles);
                         articles.clear();
                         articles.add(dataSnapshot.getValue(Article.class));
-                        articles.get(articles.size() - 1).setID(dataSnapshot.getKey());
+                        articles.get(articles.size() - 1).setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article","")));
                         articles.addAll(tempArticles);
+                        articleSize = articles.size() + 1;
                         tempArticles.clear();
                         articleAdapter.notifyDataSetChanged();
                     }
@@ -242,12 +244,12 @@ public class HomeFragment extends Fragment {
                     System.out.println("\n----child changed---------\n" + dataSnapshot.toString());
                     System.out.println("\n----child changed key---------\n" + dataSnapshot.getKey());
                     Article changedArticle = dataSnapshot.getValue(Article.class);
-                    changedArticle.setID(dataSnapshot.getKey());
+                    changedArticle.setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article","")));
 
                     int replaceIndex = 0;
                     for (Article iterationArticle : articles) {
-                        if (iterationArticle.getID().equalsIgnoreCase(changedArticle.getID())) {
-                            iterationArticle.setID(changedArticle.getID());
+                        if (iterationArticle.getIdentifier() == (changedArticle.getIdentifier())) {
+                            iterationArticle.setIdentifier(changedArticle.getIdentifier());
                             articles.set(replaceIndex, changedArticle);
                             break;
                         }
@@ -261,7 +263,7 @@ public class HomeFragment extends Fragment {
                     System.out.println("\n----child removed---------\n" + dataSnapshot.toString());
                     System.out.println("\n----child removed key---------\n" + dataSnapshot.getKey());
                     for (Article iterationArticle : articles) {
-                        if (iterationArticle.getID().equalsIgnoreCase(dataSnapshot.getKey())) {
+                        if (iterationArticle.getIdentifier() == Integer.parseInt(dataSnapshot.getKey().replace("article",""))) {
                             articles.remove(iterationArticle);
                             break;
                         }
