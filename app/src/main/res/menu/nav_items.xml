@@ -21,6 +21,31 @@
             android:icon="@mipmap/ic_launcher"
             android:title="Add Article"
             android:visible="false" />
+        <item
+            android:id="@+id/view_my_articles"
+            android:icon="@mipmap/ic_launcher"
+            android:title="View My Articles"
+            android:visible="false" />
+        <item
+            android:id="@+id/publish_articles"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Publish Articles"
+            android:visible="false" />
+        <item
+            android:id="@+id/delete_articles"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Delete Articles"
+            android:visible="false" />
+        <item
+            android:id="@+id/add_categories"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Add Category"
+            android:visible="false" />
+        <item
+            android:id="@+id/delete_categories"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Delete Category"
+            android:visible="false" />
     </group>
 
     <group

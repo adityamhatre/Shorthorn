@@ -17,10 +17,19 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.thelegacycoder.theshorthornapp.Application.AppController;
 import com.thelegacycoder.theshorthornapp.Controllers.LoginController;
 import com.thelegacycoder.theshorthornapp.Fragments.AddArticleFragment;
@@ -29,6 +38,8 @@ import com.thelegacycoder.theshorthornapp.Fragments.LoginFragment;
 import com.thelegacycoder.theshorthornapp.Fragments.LoginRegisterFragment;
 import com.thelegacycoder.theshorthornapp.Interfaces.OnFragmentInteractionListener;
 import com.thelegacycoder.theshorthornapp.R;
+
+import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity implements OnFragmentInteractionListener {
 
@@ -59,11 +70,11 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
         if (dev) {
             loginController = LoginController.newInstance(this);
-            loginController.login("a@a.com", "asdfasdf", false);
+            loginController.login("d@d.com", "asdfasdf", false);
         }
 
 
-        changeFragment(HomeFragment.newInstance("Welcome"));
+        changeFragment(HomeFragment.newInstance("reader"));
 
 
     }
@@ -107,13 +118,107 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
                             Toast.makeText(HomeActivity.this, "Already logged in", Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.drawer_item_home:
-                        changeFragment(HomeFragment.newInstance("Welcome"));
+                        changeFragment(HomeFragment.newInstance("reader"));
+                        break;
+                    case R.id.view_my_articles:
+                        changeFragment(HomeFragment.newInstance("writer"));
+                        break;
+                    case R.id.delete_articles:
+                        changeFragment(HomeFragment.newInstance("editor-delete"));
+                        break;
+                    case R.id.publish_articles:
+                        changeFragment(HomeFragment.newInstance("editor-publish"));
+                        break;
+                    case R.id.add_categories:
+                        add_category();
+                        break;
+                    case R.id.delete_categories:
+                        delete_category();
                         break;
                 }
 
                 return false;
             }
         });
+    }
+
+    AlertDialog addCat, deleteCat;
+
+    void add_category() {
+        View view = getLayoutInflater().inflate(R.layout.dialog_add_category, null);
+        addCat = new AlertDialog.Builder(this).setView(view).create();
+        addCat.show();
+        final EditText nc = (EditText) view.findViewById(R.id.newCat);
+        view.findViewById(R.id.submit_cat).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (addCat.isShowing()) {
+                    if (!categories.contains(nc.getText().toString().trim())) {
+                        AppController.getInstance().getDatabase().getReference("categories").child("category" + (categories.size() + 1)).setValue(nc.getText().toString().trim());
+                    }
+                    addCat.cancel();
+                }
+                Toast.makeText(HomeActivity.this, "Category added!", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    void delete_category() {
+        final View view = getLayoutInflater().inflate(R.layout.filter_dialog, null);
+
+        final ListView categoryListView = (ListView) view.findViewById(R.id.category_list);
+        categoryListView.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, categories));
+        categoryListView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+
+        deleteCat = new AlertDialog.Builder(this).setView(view).setNegativeButton("Clear Filters", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                ;
+            }
+        }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int ii) {
+
+                final ArrayList<String> selectedCategories = new ArrayList<String>();
+                selectedCategories.clear();
+                int len = categoryListView.getCount();
+                SparseBooleanArray checked = categoryListView.getCheckedItemPositions();
+                for (int i = 0; i < len; i++)
+                    if (checked.get(i)) {
+                        String item = categories.get(i);
+  /* do whatever you want with the checked item */
+                        selectedCategories.add(item);
+                    }
+                System.out.println(selectedCategories.toString());
+                deleteCat.cancel();
+                if (selectedCategories.size() > 0) {
+
+                    AppController.getInstance().getDatabase().getReference("categories").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                if (selectedCategories.contains(snapshot.getValue(String.class))) {
+                                    snapshot.getRef().setValue(null);
+
+                                }
+                            }
+                            Toast.makeText(HomeActivity.this, "Category Removed", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+
+            }
+
+        }).create();
+        deleteCat.show();
+
     }
 
     void initToolbar() {
@@ -174,13 +279,50 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
             navigationView.getMenu().getItem(0).setChecked(true);
             navigationView.getMenu().findItem(R.id.drawer_item_login).setVisible(false);
             navigationView.getMenu().findItem(R.id.drawer_item_register).setVisible(false);
-            changeFragment(HomeFragment.newInstance("Welcome, user: " + AppController.getInstance().getmAuth().getCurrentUser().getEmail()));
+            if (AppController.getInstance().getUser().getType().equalsIgnoreCase("writer")) {
+                navigationView.getMenu().findItem(R.id.view_my_articles).setVisible(true);
+                navigationView.getMenu().findItem(R.id.delete_categories).setVisible(false);
+                navigationView.getMenu().findItem(R.id.add_categories).setVisible(false);
+            }
+            if (AppController.getInstance().getUser().getType().equalsIgnoreCase("editor")) {
+                navigationView.getMenu().findItem(R.id.publish_articles).setVisible(true);
+                navigationView.getMenu().findItem(R.id.delete_articles).setVisible(true);
+                navigationView.getMenu().findItem(R.id.delete_categories).setVisible(false);
+                navigationView.getMenu().findItem(R.id.add_categories).setVisible(false);
+            }
+            if (AppController.getInstance().getUser().getType().equalsIgnoreCase("admin")) {
+                navigationView.getMenu().findItem(R.id.publish_articles).setVisible(true);
+                navigationView.getMenu().findItem(R.id.delete_articles).setVisible(true);
+                navigationView.getMenu().findItem(R.id.delete_categories).setVisible(true);
+                navigationView.getMenu().findItem(R.id.add_categories).setVisible(true);
+            }
+
+            changeFragment(HomeFragment.newInstance("reader"));
             invalidateOptionsMenu();
+
+            categories = new ArrayList<>();
+
+            AppController.getInstance().getDatabase().getReference("categories").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    categories.clear();
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        categories.add(snapshot.getValue(String.class));
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
         } else {
         }
 
     }
 
+    ArrayList<String> categories;
     AlertDialog alertDialog;
 
     @Override
@@ -248,9 +390,9 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
 
     @Override
     public void onBackPressed() {
-        if(currentFragment == AddArticleFragment.class){
-            changeFragment(HomeFragment.newInstance(""));
-        }
+        if (currentFragment == AddArticleFragment.class) {
+            changeFragment(HomeFragment.newInstance("reader"));
+        } else super.onBackPressed();
     }
 
     public static NavigationView getNavigationView() {
@@ -260,6 +402,12 @@ public class HomeActivity extends AppCompatActivity implements OnFragmentInterac
     public void logoutCallback() {
         navigationView.getMenu().findItem(R.id.drawer_item_login).setVisible(true);
         navigationView.getMenu().findItem(R.id.drawer_item_register).setVisible(true);
+        navigationView.getMenu().findItem(R.id.view_my_articles).setVisible(false);
+        navigationView.getMenu().findItem(R.id.publish_articles).setVisible(false);
+        navigationView.getMenu().findItem(R.id.delete_articles).setVisible(false);
+        navigationView.getMenu().findItem(R.id.drawer_add_article).setVisible(false);
+        navigationView.getMenu().findItem(R.id.add_categories).setVisible(false);
+        navigationView.getMenu().findItem(R.id.delete_categories).setVisible(false);
         invalidateOptionsMenu();
         changeFragment(HomeFragment.newInstance("Logout"));
     }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,8 +16,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -31,7 +29,6 @@ import com.thelegacycoder.theshorthornapp.R;
 
 import java.util.ArrayList;
 
-import static com.thelegacycoder.theshorthornapp.Fragments.HomeFragment.articleSize;
 
 public class AddArticleFragment extends Fragment {
     ImageView arc_img;
@@ -82,6 +79,9 @@ public class AddArticleFragment extends Fragment {
 
     }
 
+    public static long pendingArticleSize = 0;
+    int counter = 0;
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -122,37 +122,34 @@ public class AddArticleFragment extends Fragment {
         btn_publish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!arc_title.getText().toString().equals("") && !arc_body.getText().toString().equals("")) {
-                    if (uri != null)
-                        AppController.getInstance().getStorageReference().child("articles").child("article" + articleSize).putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                System.out.println("uploaded");
-                                final Article newArticle = new Article(articleSize, arc_title.getText().toString(), arc_body.getText().toString(),
-                                        AppController.getInstance().getUser().getName(), "article" + articleSize, categorySpinner.getSelectedItem().toString());
-                                AppController.getInstance().getDatabase().getReference().child("articles").child("article" + articleSize).setValue(newArticle).addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        Toast.makeText(getActivity(), "Article added!", Toast.LENGTH_SHORT).show();
-                                        getActivity().onBackPressed();
-                                    }
-                                });
-                            }
-                        });
-                    else {
-                        final Article newArticle = new Article(articleSize, arc_title.getText().toString(), arc_body.getText().toString(),
-                                AppController.getInstance().getUser().getName(), "noImage", categorySpinner.getSelectedItem().toString());
-                        AppController.getInstance().getDatabase().getReference().child("articles").child("article" + articleSize).setValue(newArticle).addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                Toast.makeText(getActivity(), "Article added!", Toast.LENGTH_SHORT).show();
-                                getActivity().onBackPressed();
+                AppController.getInstance().getDatabase().getReference().child("identifier").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(final DataSnapshot dataSnapshot) {
+                        final int identifier = (dataSnapshot.getValue(Integer.class));
+                        if (uri != null) {
+                            AppController.getInstance().getStorageReference().child("articles").child("article" + (identifier + 1)).putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                            }
-                        });
+                                    Article article = new Article(identifier + 1, arc_title.getText().toString(), arc_body.getText().toString(), AppController.getInstance().getUser().getName(), "article" + (identifier + 1), categorySpinner.getSelectedItem().toString());
+                                    AppController.getInstance().getDatabase().getReference().child("pendingArticles").push().setValue(article);
+                                    AppController.getInstance().getDatabase().getReference().child("identifier").setValue(identifier + 1);
+
+                                    getActivity().onBackPressed();
+                                }
+                            });
+                        } else {
+
+                        }
+
+
                     }
 
-                }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
             }
         });

@@ -36,6 +36,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.UploadTask;
 import com.thelegacycoder.theshorthornapp.Activities.ViewArticleActivity;
@@ -48,9 +49,13 @@ import com.thelegacycoder.theshorthornapp.R;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
+import static com.google.android.gms.internal.zzs.TAG;
+
 public class HomeFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static String MODE = "MODE";
+
 
     private View filterView;
     private AlertDialog filterDialog;
@@ -70,20 +75,11 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     public static HomeFragment newInstance(String param1) {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, "");
         fragment.setArguments(args);
         return fragment;
     }
@@ -92,8 +88,8 @@ public class HomeFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            MODE = mParam1 = getArguments().getString(ARG_PARAM1);
+
         }
 
 
@@ -115,6 +111,7 @@ public class HomeFragment extends Fragment {
         //((TextView) view.findViewById(R.id.text)).setText(mParam1);
 
         //showFileChooser();
+
 
         if (AppController.getInstance().isLoggedIn()) {
             //Toast.makeText(getActivity(), mParam1, Toast.LENGTH_SHORT).show();
@@ -211,78 +208,370 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onItemClick(View view, Article article, int position) {
-                    startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article));
+                    startActivity(new Intent(getActivity(), ViewArticleActivity.class).putExtra("article", article).putExtra("MODE", MODE));
+                }
+
+                @Override
+                public void onRequestToDeleteClick(final Article article) {
+                    AppController.getInstance().getDatabase().getReference().child("toBeDeletedArticles").push().setValue(article).addOnCompleteListener(getActivity(), new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            articles.remove(article);
+                            articleAdapter.notifyDataSetChanged();
+                            Toast.makeText(getActivity(), "Request to delete !!!!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+
+                @Override
+                public void onPublishClick(final Article article) {
+                    AppController.getInstance().getDatabase().getReference().child("pendingArticles").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()
+                                    ) {
+                                Article iterationArticle = snapshot.getValue(Article.class);
+                                if (iterationArticle.getIdentifier() == article.getIdentifier()) {
+
+                                    System.out.println(article.getIdentifier());
+                                    AppController.getInstance().getDatabase().getReference().child("pendingArticles").child(snapshot.getKey()).setValue(null);
+                                    AppController.getInstance().getDatabase().getReference().child("articles").push().setValue(article);
+                                    articles.remove(article);
+                                    articleAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            System.out.println(databaseError.getMessage());
+                        }
+                    });
+
+                    Toast.makeText(getActivity(), "Publish !!!!", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onDeleteClick(final Article article) {
+                    AppController.getInstance().getDatabase().getReference().child("pendingArticles").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (final DataSnapshot snapshot : dataSnapshot.getChildren()
+                                    ) {
+                                Article iterationArticle = snapshot.getValue(Article.class);
+                                if (iterationArticle.getIdentifier() == article.getIdentifier()) {
+                                    AppController.getInstance().getDatabase().getReference("pendingArticles").child(snapshot.getKey()).setValue(null);
+                                    AppController.getInstance().getStorageReference().child("articles").child("article" + article.getIdentifier()).delete();
+                                    articles.remove(article);
+                                    articleAdapter.notifyDataSetChanged();
+                                    Toast.makeText(getActivity(), "Delete !!!!", Toast.LENGTH_SHORT).show();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            System.out.println(databaseError.getMessage());
+                        }
+                    });
+
+
+                }
+
+                @Override
+                public void onRequestDelete(final Article article) {
+                    System.out.println(article.getIdentifier());
+                    AppController.getInstance().getDatabase().getReference().child("toBeDeletedArticles").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()
+                                    ) {
+                                Article iterationArticle = snapshot.getValue(Article.class);
+                                System.out.println("inside: " + iterationArticle.getIdentifier());
+                                if (iterationArticle.getIdentifier() == article.getIdentifier()) {
+                                    System.out.println("inside: " + snapshot.getKey());
+                                    AppController.getInstance().getDatabase().getReference().child("toBeDeletedArticles").child(snapshot.getKey()).setValue(null);
+                                    AppController.getInstance().getStorageReference().child("articles").child("article" + article.getIdentifier()).delete();
+
+                                    articles.remove(article);
+                                    articleAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
+                    AppController.getInstance().getDatabase().getReference().child("articles").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot snapshot : dataSnapshot.getChildren()
+                                    ) {
+                                Article iterationArticle = snapshot.getValue(Article.class);
+                                if (iterationArticle.getIdentifier() == article.getIdentifier()) {
+                                    AppController.getInstance().getDatabase().getReference().child("articles").child(snapshot.getKey()).setValue(null);
+                                    AppController.getInstance().getStorageReference().child("articles").child("article" + article.getIdentifier()).delete();
+                                    articles.remove(article);
+                                    articleAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    Toast.makeText(getActivity(), "Delete !!!!", Toast.LENGTH_SHORT).show();
                 }
             };
-            articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler);
+
+
+            switch (MODE) {
+
+                case "reader":
+                    articles.clear();
+
+                    articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler, MODE);
+
+                    AppController.getInstance().getDatabase().getReference("articles").orderByChild("identifier").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child added---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child added key---------" + dataSnapshot.getKey());
+                            if (dataSnapshot.hasChild("author") && dataSnapshot.hasChild("title") && dataSnapshot.hasChild("description") && dataSnapshot.hasChild("imageLink")) {
+
+                                //:TODO inefficient operation here...need to think how to optimize this..
+                                //:TODO maybe use a new data structure
+
+                                tempArticles.addAll(articles);
+                                articles.clear();
+                                articles.add(dataSnapshot.getValue(Article.class));
+                                /*articles.get(articles.size() - 1).setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article", "")));*/
+                                articles.addAll(tempArticles);
+                                articleSize = articles.size() + 1;
+                                tempArticles.clear();
+                                articleAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child changed---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child changed key---------\n" + dataSnapshot.getKey());
+                            Article changedArticle = dataSnapshot.getValue(Article.class);
+                            /*changedArticle.setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article", "")));*/
+
+                            int replaceIndex = 0;
+                            for (Article iterationArticle : articles) {
+                                if (iterationArticle.getIdentifier() == (changedArticle.getIdentifier())) {
+                                    /*iterationArticle.setIdentifier(changedArticle.getIdentifier());*/
+                                    articles.set(replaceIndex, changedArticle);
+                                    break;
+                                }
+                                replaceIndex++;
+                            }
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            System.out.println("\n----child removed---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child removed key---------\n" + dataSnapshot.getKey());
+                            for (Article iterationArticle : articles) {
+                                if (iterationArticle.getIdentifier() == dataSnapshot.child("identifier").getValue(Integer.class)) {
+                                    articles.remove(iterationArticle);
+                                    break;
+                                }
+                            }
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child moved---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child moved---------\n" + dataSnapshot.getKey());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d("DB ERROR", databaseError.toException().toString());
+                        }
+                    });
+                    break;
+                case "writer":
+                    articles.clear();
+                    Query query = AppController.getInstance().getDatabase().getReference("articles").orderByChild("author").equalTo(AppController.getInstance().getUser().getName());
+                    query.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                articles.add(dataSnapshot.getValue(Article.class));
+                            }
+                            articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler, MODE);
+
+                            articleRecyclerView.setAdapter(articleAdapter);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w(TAG, "getUser:onCancelled", databaseError.toException());
+                        }
+                    });
+                    break;
+                case "editor-publish":
+                    articles.clear();
+
+                    articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler, MODE);
+
+                    AppController.getInstance().getDatabase().getReference("pendingArticles").orderByChild("identifier").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child added---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child added key---------" + dataSnapshot.getKey());
+                            if (dataSnapshot.hasChild("author") && dataSnapshot.hasChild("title") && dataSnapshot.hasChild("description") && dataSnapshot.hasChild("imageLink")) {
+
+                                //:TODO inefficient operation here...need to think how to optimize this..
+                                //:TODO maybe use a new data structure
+
+                                tempArticles.addAll(articles);
+                                articles.clear();
+                                articles.add(dataSnapshot.getValue(Article.class));
+                           /*     articles.get(articles.size() - 1).setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article", "")));*/
+                                articles.addAll(tempArticles);
+                                articleSize = articles.size() + 1;
+                                tempArticles.clear();
+                                articleAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child changed---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child changed key---------\n" + dataSnapshot.getKey());
+                            Article changedArticle = dataSnapshot.getValue(Article.class);
+                            /*changedArticle.setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article", "")));*/
+
+                            int replaceIndex = 0;
+                            for (Article iterationArticle : articles) {
+                                if (iterationArticle.getIdentifier() == (changedArticle.getIdentifier())) {
+                                 /*   iterationArticle.setIdentifier(changedArticle.getIdentifier());*/
+                                    articles.set(replaceIndex, changedArticle);
+                                    break;
+                                }
+                                replaceIndex++;
+                            }
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            System.out.println("\n----child removed---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child removed key---------\n" + dataSnapshot.getKey());
+                            for (Article iterationArticle : articles) {
+                                if (iterationArticle.getIdentifier() == dataSnapshot.child("identifier").getValue(Integer.class)) {
+                                    articles.remove(iterationArticle);
+                                    break;
+                                }
+                            }
+
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child moved---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child moved---------\n" + dataSnapshot.getKey());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d("DB ERROR", databaseError.toException().toString());
+                        }
+                    });
+                    break;
+                case "editor-delete":
+                    articles.clear();
+
+                    articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler, MODE);
+
+                    AppController.getInstance().getDatabase().getReference("toBeDeletedArticles").orderByChild("identifier").addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child added---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child added key---------" + dataSnapshot.getKey());
+                            if (dataSnapshot.hasChild("author") && dataSnapshot.hasChild("title") && dataSnapshot.hasChild("description") && dataSnapshot.hasChild("imageLink")) {
+
+                                //:TODO inefficient operation here...need to think how to optimize this..
+                                //:TODO maybe use a new data structure
+
+                                tempArticles.addAll(articles);
+                                articles.clear();
+                                articles.add(dataSnapshot.getValue(Article.class));
+                           /*     articles.get(articles.size() - 1).setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article", "")));*/
+                                articles.addAll(tempArticles);
+                                articleSize = articles.size() + 1;
+                                tempArticles.clear();
+                                articleAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child changed---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child changed key---------\n" + dataSnapshot.getKey());
+                            Article changedArticle = dataSnapshot.getValue(Article.class);
+                            /*changedArticle.setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article", "")));*/
+
+                            int replaceIndex = 0;
+                            for (Article iterationArticle : articles) {
+                                if (iterationArticle.getIdentifier() == (changedArticle.getIdentifier())) {
+                                 /*   iterationArticle.setIdentifier(changedArticle.getIdentifier());*/
+                                    articles.set(replaceIndex, changedArticle);
+                                    break;
+                                }
+                                replaceIndex++;
+                            }
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            System.out.println("\n----child removed---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child removed key---------\n" + dataSnapshot.getKey());
+                            for (Article iterationArticle : articles) {
+                                if (iterationArticle.getIdentifier() == dataSnapshot.child("identifier").getValue(Integer.class)) {
+                                    articles.remove(iterationArticle);
+                                    break;
+                                }
+                            }
+
+                            articleAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                            System.out.println("\n----child moved---------\n" + dataSnapshot.toString());
+                            System.out.println("\n----child moved---------\n" + dataSnapshot.getKey());
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d("DB ERROR", databaseError.toException().toString());
+                        }
+                    });
+                    break;
+            }
 
             articleRecyclerView.setAdapter(articleAdapter);
-
-            AppController.getInstance().getDatabase().getReference("articles").orderByChild("identifier").addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    System.out.println("\n----child added---------\n" + dataSnapshot.toString());
-                    System.out.println("\n----child added key---------" + dataSnapshot.getKey());
-                    if (dataSnapshot.hasChild("author") && dataSnapshot.hasChild("title") && dataSnapshot.hasChild("description") && dataSnapshot.hasChild("imageLink")) {
-
-                        //:TODO inefficient operation here...need to think how to optimize this..
-                        //:TODO maybe use a new data structure
-
-                        tempArticles.addAll(articles);
-                        articles.clear();
-                        articles.add(dataSnapshot.getValue(Article.class));
-                        articles.get(articles.size() - 1).setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article","")));
-                        articles.addAll(tempArticles);
-                        articleSize = articles.size() + 1;
-                        tempArticles.clear();
-                        articleAdapter.notifyDataSetChanged();
-                    }
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    System.out.println("\n----child changed---------\n" + dataSnapshot.toString());
-                    System.out.println("\n----child changed key---------\n" + dataSnapshot.getKey());
-                    Article changedArticle = dataSnapshot.getValue(Article.class);
-                    changedArticle.setIdentifier(Integer.parseInt(dataSnapshot.getKey().replace("article","")));
-
-                    int replaceIndex = 0;
-                    for (Article iterationArticle : articles) {
-                        if (iterationArticle.getIdentifier() == (changedArticle.getIdentifier())) {
-                            iterationArticle.setIdentifier(changedArticle.getIdentifier());
-                            articles.set(replaceIndex, changedArticle);
-                            break;
-                        }
-                        replaceIndex++;
-                    }
-                    articleAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    System.out.println("\n----child removed---------\n" + dataSnapshot.toString());
-                    System.out.println("\n----child removed key---------\n" + dataSnapshot.getKey());
-                    for (Article iterationArticle : articles) {
-                        if (iterationArticle.getIdentifier() == Integer.parseInt(dataSnapshot.getKey().replace("article",""))) {
-                            articles.remove(iterationArticle);
-                            break;
-                        }
-                    }
-                    articleAdapter.notifyDataSetChanged();
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                    System.out.println("\n----child moved---------\n" + dataSnapshot.toString());
-                    System.out.println("\n----child moved---------\n" + dataSnapshot.getKey());
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("DB ERROR", databaseError.toException().toString());
-                }
-            });
-
             AppController.getInstance().getDatabase().getReference("categories").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -303,7 +592,7 @@ public class HomeFragment extends Fragment {
                                 categoryListView.setItemChecked(j, false);
                             }
 
-                            articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler);
+                            articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler, MODE);
                             articleRecyclerView.setAdapter(articleAdapter);
                         }
                     }).setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -330,10 +619,10 @@ public class HomeFragment extends Fragment {
                                     }
                                 }
 
-                                articleAdapter = new ArticleAdapter(getActivity(), filteredArticles, itemsClickHandler);
+                                articleAdapter = new ArticleAdapter(getActivity(), filteredArticles, itemsClickHandler, MODE);
                                 articleRecyclerView.setAdapter(articleAdapter);
                             } else {
-                                articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler);
+                                articleAdapter = new ArticleAdapter(getActivity(), articles, itemsClickHandler, MODE);
                                 articleRecyclerView.setAdapter(articleAdapter);
                             }
 

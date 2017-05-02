@@ -35,10 +35,12 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     private ClickHandler clickHandler;
 
     private ArrayList<Integer> likesList;
+    private String MODE;
 
-    public ArticleAdapter(Context context, ArrayList<Article> articles, ClickHandler clickHandler) {
+    public ArticleAdapter(Context context, ArrayList<Article> articles, ClickHandler clickHandler, String MODE) {
         this.articles = articles;
         this.context = context;
+        this.MODE = MODE;
         this.clickHandler = clickHandler;
         likesList = new ArrayList<>();
         AppController.getInstance().getDatabase().getReference("users").child(AppController.getInstance().getmAuth().getCurrentUser().getUid()).child("likes").addValueEventListener(new ValueEventListener() {
@@ -81,7 +83,7 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, description, author;
         ImageView image;
-        Button reportButton, shareButton, likeButton;
+        Button reportButton, shareButton, likeButton, requestToDeleteButton, publishButton, deleteButton, editordeleteButton;
 
         ViewHolder(final View itemView) {
             super(itemView);
@@ -93,7 +95,10 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             reportButton = (Button) itemView.findViewById(R.id.report_button);
             likeButton = (Button) itemView.findViewById(R.id.like_button);
             shareButton = (Button) itemView.findViewById(R.id.share_button);
-
+            requestToDeleteButton = (Button) itemView.findViewById(R.id.request_delete_button);
+            publishButton = (Button) itemView.findViewById(R.id.publish_button);
+            deleteButton = (Button) itemView.findViewById(R.id.delete_button);
+            editordeleteButton = (Button) itemView.findViewById(R.id.editor_delete_button);
 
             reportButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -113,6 +118,33 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
                     clickHandler.onLikeClick((Button) view, articles.get(getAdapterPosition()), getAdapterPosition(), ((Button) (view)).getText().toString().equalsIgnoreCase("like"));
                 }
             });
+            requestToDeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onRequestToDeleteClick(articles.get(getAdapterPosition()));
+                }
+            });
+
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onDeleteClick(articles.get(getAdapterPosition()));
+
+                }
+            });
+            editordeleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onRequestDelete(articles.get(getAdapterPosition()));
+                }
+            });
+            publishButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clickHandler.onPublishClick(articles.get(getAdapterPosition()));
+                }
+            });
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -127,8 +159,8 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
             title.setText(article.getTitle());
             author.setText(article.getAuthor());
             if (article.getImageLink() != null) {
-                System.out.println("article" + (articles.size() - position));
-                System.out.println(article.getImageLink());
+                //System.out.println("article" + (articles.size() - position));
+                System.out.println("AIL: " + article.getImageLink());
                 AppController.getInstance().getStorageReference().child("articles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
@@ -153,8 +185,49 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
                 System.out.println("changing to like");
                 likeButton.setText("Like");
             }
-        }
 
+            System.out.println(MODE);
+            switch (MODE.toLowerCase()) {
+                case "writer":
+                    likeButton.setVisibility(View.INVISIBLE);
+                    reportButton.setVisibility(View.INVISIBLE);
+                    shareButton.setVisibility(View.INVISIBLE);
+                    requestToDeleteButton.setVisibility(View.VISIBLE);
+                    deleteButton.setVisibility(View.INVISIBLE);
+                    publishButton.setVisibility(View.INVISIBLE);
+                    editordeleteButton.setVisibility(View.INVISIBLE);
+                    break;
+                case "reader":
+                    likeButton.setVisibility(View.VISIBLE);
+                    reportButton.setVisibility(View.VISIBLE);
+                    shareButton.setVisibility(View.VISIBLE);
+                    requestToDeleteButton.setVisibility(View.INVISIBLE);
+                    deleteButton.setVisibility(View.INVISIBLE);
+                    publishButton.setVisibility(View.INVISIBLE);
+                    editordeleteButton.setVisibility(View.INVISIBLE);
+                    break;
+                case "editor-publish":
+                    likeButton.setVisibility(View.INVISIBLE);
+                    reportButton.setVisibility(View.INVISIBLE);
+                    shareButton.setVisibility(View.INVISIBLE);
+                    requestToDeleteButton.setVisibility(View.INVISIBLE);
+                    deleteButton.setVisibility(View.VISIBLE);
+                    publishButton.setVisibility(View.VISIBLE);
+                    editordeleteButton.setVisibility(View.INVISIBLE);
+                    break;
+                case "editor-delete":
+                    likeButton.setVisibility(View.INVISIBLE);
+                    reportButton.setVisibility(View.INVISIBLE);
+                    shareButton.setVisibility(View.INVISIBLE);
+                    requestToDeleteButton.setVisibility(View.INVISIBLE);
+                    publishButton.setVisibility(View.INVISIBLE);
+                    deleteButton.setVisibility(View.INVISIBLE);
+                    editordeleteButton.setVisibility(View.VISIBLE);
+                    break;
+
+            }
+
+        }
     }
 
     public interface ClickHandler {
@@ -165,5 +238,13 @@ public class ArticleAdapter extends RecyclerView.Adapter<ArticleAdapter.ViewHold
         void onLikeClick(Button likeButton, Article article, int position, boolean liked);
 
         void onItemClick(View view, Article article, int position);
+
+        void onRequestToDeleteClick(Article article);//writer
+
+        void onPublishClick(Article article);//admin...editor pushlish
+
+        void onDeleteClick(Article article);//admin...editor requested articles
+
+        void onRequestDelete(Article article);//admin
     }
 }

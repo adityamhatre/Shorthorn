@@ -18,25 +18,41 @@ public class ViewArticleActivity extends AppCompatActivity {
 
     private Article article;
 
+    private String MODE;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_article);
 
         article = getIntent().getParcelableExtra("article");
+        MODE = getIntent().getStringExtra("MODE");
 
-        if (article != null) {
-            ((TextView) findViewById(R.id.article_title)).setText(article.getTitle());
+        if (MODE.equalsIgnoreCase("editor-publish")) {
+            if (article != null) {
+                ((TextView) findViewById(R.id.article_title)).setText(article.getTitle());
 
-            ((WebView) findViewById(R.id.article_description)).loadData("<html><body><p align=\"justify\">" + article.getDescription() + "</p></body></html>", "text/html", "UTF-8");
-            AppController.getInstance().getStorageReference().child("articles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    Picasso.with(ViewArticleActivity.this).load(uri).placeholder(R.drawable.loading).fit().centerInside().into((ImageView) findViewById(R.id.article_image));
-                }
-            });
+                ((WebView) findViewById(R.id.article_description)).loadData("<html><body><p align=\"justify\">" + article.getDescription() + "</p></body></html>", "text/html", "UTF-8");
+                AppController.getInstance().getStorageReference().child("pendingArticles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.with(ViewArticleActivity.this).load(uri).placeholder(R.drawable.loading).fit().centerInside().into((ImageView) findViewById(R.id.article_image));
+                    }
+                });
+            }
+        } else {
+            if (article != null) {
+                ((TextView) findViewById(R.id.article_title)).setText(article.getTitle());
+
+                ((WebView) findViewById(R.id.article_description)).loadData("<html><body><p align=\"justify\">" + article.getDescription() + "</p></body></html>", "text/html", "UTF-8");
+                AppController.getInstance().getStorageReference().child("articles").child(article.getImageLink()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        Picasso.with(ViewArticleActivity.this).load(uri).placeholder(R.drawable.loading).fit().centerInside().into((ImageView) findViewById(R.id.article_image));
+                    }
+                });
+            }
         }
-
 
     }
 }
